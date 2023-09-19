@@ -1,3 +1,5 @@
+find_package(OpenGL REQUIRED)
+
 add_executable(${CMAKE_PROJECT_NAME} main.cpp)
 
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_PROJECT_NAME}::project_options
@@ -8,6 +10,9 @@ target_link_system_libraries(
   PRIVATE
   CLI11::CLI11
   fmt::fmt
-  spdlog::spdlog)
+  spdlog::spdlog
+  SDL2
+  imgui
+  OpenGL::OpenGL)
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "${CMAKE_BINARY_DIR}/config/include")

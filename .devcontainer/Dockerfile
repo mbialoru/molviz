@@ -23,6 +23,10 @@ RUN apt-get install -y --no-install-recommends \
         openssh-client gpg-agent socat rsync make ninja-build \
         git python3 python3-pip
 
+# Install OpenGL libraries
+RUN apt-get install -y --no-install-recommends \
+        libgl1-mesa-dev libxext-dev
+
 # Install cmake-format
 RUN python3 -m pip install --upgrade pip setuptools --break-system-packages && \
     python3 -m pip install cmake-format --break-system-packages && \
