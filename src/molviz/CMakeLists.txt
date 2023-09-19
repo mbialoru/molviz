@@ -1,4 +1,5 @@
 find_package(OpenGL REQUIRED)
+find_package(GLEW REQUIRED)
 
 add_executable(${CMAKE_PROJECT_NAME} main.cpp)
 
@@ -13,6 +14,7 @@ target_link_system_libraries(
   spdlog::spdlog
   SDL2
   imgui
-  OpenGL::OpenGL)
+  OpenGL::OpenGL
+  GLEW::GLEW)
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "${CMAKE_BINARY_DIR}/config/include")

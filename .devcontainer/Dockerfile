@@ -25,7 +25,7 @@ RUN apt-get install -y --no-install-recommends \
 
 # Install OpenGL libraries
 RUN apt-get install -y --no-install-recommends \
-        libgl1-mesa-dev libxext-dev
+        libgl1-mesa-dev libxext-dev libglew-dev
 
 # Install cmake-format
 RUN python3 -m pip install --upgrade pip setuptools --break-system-packages && \
