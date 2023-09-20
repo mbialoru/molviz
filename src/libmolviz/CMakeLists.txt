@@ -10,7 +10,15 @@ add_library(${CMAKE_PROJECT_NAME}::lib${CMAKE_PROJECT_NAME} ALIAS lib${CMAKE_PRO
 # remove `lib` prefix
 set_target_properties(lib${CMAKE_PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX PREFIX "")
 
-target_link_system_libraries(lib${CMAKE_PROJECT_NAME} PRIVATE fmt::fmt)
+add_subdirectory(gfx)
+
+target_link_system_libraries(
+  lib${CMAKE_PROJECT_NAME}
+  PRIVATE
+  fmt::fmt
+  spdlog::spdlog
+  GLEW::GLEW)
+
 target_link_libraries(lib${CMAKE_PROJECT_NAME} PRIVATE project_options project_warnings)
 
 target_include_directories(
