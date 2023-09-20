@@ -14,6 +14,11 @@ endif()
 # when compiling with PCH enabled
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Set output directories
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 # Set the project name and language
 project(
   molviz
@@ -21,6 +26,9 @@ project(
   DESCRIPTION ""
   HOMEPAGE_URL "%%myurl%%"
   LANGUAGES CXX C)
+
+find_package(OpenGL REQUIRED)
+find_package(GLEW REQUIRED)
 
 include(cmake/PreventInSourceBuilds.cmake)
 include(ProjectOptions.cmake)
@@ -48,7 +56,7 @@ target_compile_features(project_options INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
 add_library(${CMAKE_PROJECT_NAME}::project_options ALIAS project_options)
 add_library(${CMAKE_PROJECT_NAME}::project_warnings ALIAS project_warnings)
 
-# configure files based on CMake configuration options
+# Configure files based on CMake configuration options
 add_subdirectory(config)
 
 # Adding the src:

@@ -8,12 +8,14 @@
 #include <imgui_impl_sdl2.h>
 #include <spdlog/spdlog.h>
 
+#include "gfx/shader.hpp"
+
 // Main code
 int main(int argc, char **argv)
 {
   // Setup SDL
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0) {
-    spdlog::error("SDL initialization error: {}\n", SDL_GetError());
+    spdlog::error("SDL initialization error: {}", SDL_GetError());
     return -1;
   }
 
@@ -58,7 +60,7 @@ int main(int argc, char **argv)
   SDL_GL_MakeCurrent(window, gl_context);
 
   // Use Vsync
-  if (SDL_GL_SetSwapInterval(1) < 0) { spdlog::warn("Unable to set VSync! SDL Error: {}\n", SDL_GetError()); }
+  if (SDL_GL_SetSwapInterval(1) < 0) { spdlog::warn("Unable to set VSync! SDL Error: {}", SDL_GetError()); }
 
   // Setup Dear ImGui context
   IMGUI_CHECKVERSION();
@@ -89,40 +91,8 @@ int main(int argc, char **argv)
     .5f * float(std::sqrt(3)) * 2 / 3,
     .0f };
 
-  // Vertex Shader source code
-  const char *vertexShaderSource =
-    "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
-  // Fragment Shader source code
-  const char *fragmentShaderSource =
-    "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = vec4(0.8f, 0.3f, 0.02f, 1.0f);\n"
-    "}\n\0";
-
-  GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertex_shader, 1, &vertexShaderSource, NULL);
-  glCompileShader(vertex_shader);
-
-  GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragment_shader, 1, &fragmentShaderSource, NULL);
-  glCompileShader(fragment_shader);
-
-  GLuint shader_program = glCreateProgram();
-  glAttachShader(shader_program, vertex_shader);
-  glAttachShader(shader_program, fragment_shader);
-
-  glLinkProgram(shader_program);
-
-  // cleanup shaders
-  glDeleteShader(vertex_shader);
-  glDeleteShader(fragment_shader);
+  Molviz::gfx::Shader shader{ "/workspaces/molviz/out/build/unixlike-gcc-debug/resources/shaders/default.vert",
+    "/workspaces/molviz/out/build/unixlike-gcc-debug/resources/shaders/default.frag" };
 
   // vertex array object
   GLuint VAO;
@@ -156,10 +126,11 @@ int main(int argc, char **argv)
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
       ImGui_ImplSDL2_ProcessEvent(&event);
-      if (event.type == SDL_QUIT) done = true;
+      if (event.type == SDL_QUIT) { done = true; }
       if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE
-          && event.window.windowID == SDL_GetWindowID(window))
+          && event.window.windowID == SDL_GetWindowID(window)) {
         done = true;
+      }
     }
 
     // Start the Dear ImGui frame
@@ -167,13 +138,9 @@ int main(int argc, char **argv)
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
 
-    // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to
-    // learn more about Dear ImGui!).
-    if (show_demo_window) ImGui::ShowDemoWindow(&show_demo_window);
-
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
     {
-      static float f = 0.0f;
+      static float slider_float = 0.0F;
       static int counter = 0;
 
       ImGui::Begin("Hello, world!");// Create a window called "Hello, world!" and append into it.
@@ -182,7 +149,7 @@ int main(int argc, char **argv)
       ImGui::Checkbox("Demo Window", &show_demo_window);// Edit bools storing our window open/close state
       ImGui::Checkbox("Another Window", &show_another_window);
 
-      ImGui::SliderFloat("float", &f, 0.0f, 1.0f);// Edit 1 float using a slider from 0.0f to 1.0f
+      ImGui::SliderFloat("float", &slider_float, 0.0F, 1.0F);// Edit 1 float using a slider from 0.0f to 1.0f
       ImGui::ColorEdit3("clear color", (float *)&clear_color);// Edit 3 floats representing a color
 
       if (ImGui::Button("Button"))// Buttons return true when clicked (most widgets return true when edited/activated)
@@ -209,7 +176,7 @@ int main(int argc, char **argv)
     glClearColor(
       clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
-    glUseProgram(shader_program);
+    shader.activate();
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -224,7 +191,8 @@ int main(int argc, char **argv)
 
   glDeleteVertexArrays(1, &VAO);
   glDeleteBuffers(1, &VBO);
-  glDeleteProgram(shader_program);
+
+  shader.cleanup();
 
   SDL_GL_DeleteContext(gl_context);
   SDL_DestroyWindow(window);
