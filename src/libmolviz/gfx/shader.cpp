@@ -17,10 +17,19 @@ std::string Molviz::gfx::shader_type_to_string(const ShaderType t_type)
   }
 }
 
-Shader::Shader(const char *tp_vertex_shader, const char *tp_fragment_shader) : id(glCreateProgram())
+Shader::Shader(const char *tp_vertex_shader, const char *tp_fragment_shader)
+  : Shader(std::filesystem::path(tp_vertex_shader), std::filesystem::path(tp_fragment_shader))
+{}
+
+Shader::Shader(const std::string t_vertex_shader, const std::string t_fragment_shader)
+  : Shader(std::filesystem::path(t_vertex_shader), std::filesystem::path(t_fragment_shader))
+{}
+
+Shader::Shader(const std::filesystem::path t_vertex_shader, const std::filesystem::path t_fragment_shader)
+  : id(glCreateProgram())
 {
-  std::string vertex_source_string{ file_contents_to_string(tp_vertex_shader) };
-  std::string fragment_source_string{ file_contents_to_string(tp_fragment_shader) };
+  std::string vertex_source_string{ file_contents_to_string(t_vertex_shader) };
+  std::string fragment_source_string{ file_contents_to_string(t_fragment_shader) };
 
   const char *p_vertex_source{ vertex_source_string.c_str() };
   const char *p_fragment_source{ fragment_source_string.c_str() };
@@ -46,7 +55,9 @@ Shader::Shader(const char *tp_vertex_shader, const char *tp_fragment_shader) : i
   // cleanup
   glDeleteShader(vertex_shader);
   glDeleteShader(fragment_shader);
-};
+
+  spdlog::info("Initialized shader program");
+}
 
 Shader::~Shader() { cleanup(); }
 

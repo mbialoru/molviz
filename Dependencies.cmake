@@ -51,4 +51,8 @@ function(project_setup_dependencies)
     target_link_system_libraries(imgui PRIVATE SDL2::SDL2)
   endif()
 
+  if(NOT TARGET glm::glm)
+    cpmaddpackage("gh:g-truc/glm#0.9.9.8")
+  endif()
+
 endfunction()

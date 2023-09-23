@@ -13,7 +13,8 @@ target_link_system_libraries(
   SDL2
   imgui
   OpenGL::OpenGL
-  GLEW::GLEW)
+  GLEW::GLEW
+  glm::glm)
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "${CMAKE_BINARY_DIR}/config/include")
 
