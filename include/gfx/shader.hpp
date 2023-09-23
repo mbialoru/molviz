@@ -18,6 +18,8 @@ class Shader
 {
 public:
   Shader(const char *tp_vertex_shader, const char *tp_fragment_shader);
+  Shader(const std::string t_vertex_shader, const std::string t_fragment_shader);
+  Shader(const std::filesystem::path t_vertex_shader, const std::filesystem::path t_fragment_shader);
   ~Shader();
 
   void activate();

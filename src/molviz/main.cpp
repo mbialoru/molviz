@@ -3,12 +3,18 @@
 #include <SDL_opengl.h>
 #include <cmath>
 #include <cstdio>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl2.h>
 #include <spdlog/spdlog.h>
 
+#include "gfx/elementbuffer.hpp"
 #include "gfx/shader.hpp"
+#include "gfx/vertexarray.hpp"
+#include "gfx/vertexbuffer.hpp"
 
 // Main code
 int main(int argc, char **argv)
@@ -18,7 +24,6 @@ int main(int argc, char **argv)
     spdlog::error("SDL initialization error: {}", SDL_GetError());
     return -1;
   }
-
   // Decide GL+GLSL versions
 #if defined(IMGUI_IMPL_OPENGL_ES2)
   // GL ES 2.0 + GLSL 100
@@ -42,7 +47,6 @@ int main(int argc, char **argv)
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 #endif
-
   // From 2.0.18: Enable native IME.
 #ifdef SDL_HINT_IME_SHOW_UI
   SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
@@ -54,7 +58,7 @@ int main(int argc, char **argv)
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
   SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
   SDL_Window *window = SDL_CreateWindow(
-    "Dear ImGui SDL2+OpenGL3 example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
+    "Dear ImGui SDL2+OpenGL3 example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 800, window_flags);
   SDL_GLContext gl_context = SDL_GL_CreateContext(window);
   glewInit();
   SDL_GL_MakeCurrent(window, gl_context);
@@ -77,40 +81,72 @@ int main(int argc, char **argv)
   ImGui_ImplOpenGL3_Init(glsl_version);
 
   // Our state
-  bool show_demo_window = true;
-  bool show_another_window = false;
-  ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+  ImVec4 clear_color = ImVec4(0.30F, 0.50F, 0.40F, 1.00F);
 
-  GLfloat vertices[] = { -.5f,
-    -.5f * float(std::sqrt(3)) / 3,
-    .0f,
-    .5f,
-    -.5f * float(std::sqrt(3)) / 3,
-    .0f,
-    .0f,
-    .5f * float(std::sqrt(3)) * 2 / 3,
-    .0f };
+  // Vertices coordinates
+  GLfloat vertices[] = {
+    -0.5F,
+    0.0F,
+    0.5F,
+    0.83F,
+    0.70F,
+    0.44F,
+    -0.5F,
+    0.0F,
+    -0.5F,
+    0.83F,
+    0.70F,
+    0.44F,
+    0.5F,
+    0.0F,
+    -0.5F,
+    0.83F,
+    0.70F,
+    0.44F,
+    0.5F,
+    0.0F,
+    0.5F,
+    0.83F,
+    0.70F,
+    0.44F,
+    0.0F,
+    0.8F,
+    0.0F,
+    0.92F,
+    0.86F,
+    0.76F,
+  };
 
-  Molviz::gfx::Shader shader{ "/workspaces/molviz/out/build/unixlike-gcc-debug/resources/shaders/default.vert",
-    "/workspaces/molviz/out/build/unixlike-gcc-debug/resources/shaders/default.frag" };
+  // Indices for vertices order
+  GLuint indices[] = { 0, 1, 2, 0, 2, 3, 0, 1, 4, 1, 2, 4, 2, 3, 4, 3, 0, 4 };
 
-  // vertex array object
-  GLuint VAO;
-  // vertex buffer object
-  GLuint VBO;
-  glGenVertexArrays(1, &VAO);// NOTE: Ordering matters here
-  glGenBuffers(1, &VBO);
+  std::filesystem::path fragment_shader{ "../resources/shaders/default.frag" };
+  std::filesystem::path vertex_shader{ "../resources/shaders/default.vert" };
 
-  glBindVertexArray(VAO);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  Molviz::gfx::Shader shader_program{ vertex_shader.c_str(), fragment_shader.c_str() };
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-  glEnableVertexAttribArray(0);
+  Molviz::gfx::VertexArray VAO;
+  VAO.bind();
 
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
+  Molviz::gfx::VertexBuffer VBO{ vertices, sizeof(vertices) };
+  Molviz::gfx::ElementBuffer EBO{ indices, sizeof(indices) };
 
+  VAO.link_attribute(VBO, 0, 3, GL_FLOAT, 8 * sizeof(float), (void *)0);// position
+  VAO.link_attribute(VBO, 1, 3, GL_FLOAT, 8 * sizeof(float), (void *)(3 * sizeof(float)));// color
+
+  VAO.unbind();
+  VBO.unbind();
+  EBO.unbind();
+
+  int uni_id{ glGetUniformLocation(shader_program.id, "scale") };
+
+  // rotation
+  float rotation{ 0.0F };
+  Uint64 now{ SDL_GetPerformanceCounter() };
+  Uint64 last{ 0 };
+  double delta_time{ 0.0 };
+
+  glEnable(GL_DEPTH_TEST);
 
   // Main loop
   bool done = false;
@@ -138,47 +174,38 @@ int main(int argc, char **argv)
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
 
-    // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
-    {
-      static float slider_float = 0.0F;
-      static int counter = 0;
-
-      ImGui::Begin("Hello, world!");// Create a window called "Hello, world!" and append into it.
-
-      ImGui::Text("This is some useful text.");// Display some text (you can use a format strings too)
-      ImGui::Checkbox("Demo Window", &show_demo_window);// Edit bools storing our window open/close state
-      ImGui::Checkbox("Another Window", &show_another_window);
-
-      ImGui::SliderFloat("float", &slider_float, 0.0F, 1.0F);// Edit 1 float using a slider from 0.0f to 1.0f
-      ImGui::ColorEdit3("clear color", (float *)&clear_color);// Edit 3 floats representing a color
-
-      if (ImGui::Button("Button"))// Buttons return true when clicked (most widgets return true when edited/activated)
-        counter++;
-      ImGui::SameLine();
-      ImGui::Text("counter = %d", counter);
-
-      ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-      ImGui::End();
-    }
-
-    // 3. Show another simple window.
-    if (show_another_window) {
-      ImGui::Begin("Another Window", &show_another_window);// Pass a pointer to our bool variable (the window will have
-                                                           // a closing button that will clear the bool when clicked)
-      ImGui::Text("Hello from another window!");
-      if (ImGui::Button("Close Me")) show_another_window = false;
-      ImGui::End();
-    }
-
     // Rendering
     ImGui::Render();
     glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
     glClearColor(
       clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-    glClear(GL_COLOR_BUFFER_BIT);
-    shader.activate();
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    shader_program.activate();
+
+    glm::mat4 model{ glm::mat4(1.0F) };
+    glm::mat4 view{ glm::mat4(1.0F) };
+    glm::mat4 proj{ glm::mat4(1.0F) };
+
+    // rotation
+    last = now;
+    now = SDL_GetPerformanceCounter();
+    delta_time = double((now - last) * 1000) / double(SDL_GetPerformanceFrequency());
+    if (delta_time >= (1 / 60 * 1000)) { rotation += 0.5F; }
+
+    model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0F, 1.0F, 0.0F));
+    view = glm::translate(view, glm::vec3(0.0f, -0.5F, -2.0F));
+    proj = glm::perspective(glm::radians(45.0F), float(io.DisplaySize.x / io.DisplaySize.y), 0.1F, 100.0F);
+
+    int model_location{ glGetUniformLocation(shader_program.id, "model") };
+    glUniformMatrix4fv(model_location, 1, GL_FALSE, glm::value_ptr(model));
+    int view_location{ glGetUniformLocation(shader_program.id, "view") };
+    glUniformMatrix4fv(view_location, 1, GL_FALSE, glm::value_ptr(view));
+    int proj_location{ glGetUniformLocation(shader_program.id, "proj") };
+    glUniformMatrix4fv(proj_location, 1, GL_FALSE, glm::value_ptr(proj));
+
+    glUniform1f(uni_id, 0.5F);
+    VAO.bind();
+    glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     SDL_GL_SwapWindow(window);
@@ -189,10 +216,10 @@ int main(int argc, char **argv)
   ImGui_ImplSDL2_Shutdown();
   ImGui::DestroyContext();
 
-  glDeleteVertexArrays(1, &VAO);
-  glDeleteBuffers(1, &VBO);
-
-  shader.cleanup();
+  VAO.cleanup();
+  VBO.cleanup();
+  EBO.cleanup();
+  shader_program.cleanup();
 
   SDL_GL_DeleteContext(gl_context);
   SDL_DestroyWindow(window);
