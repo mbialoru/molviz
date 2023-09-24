@@ -56,6 +56,7 @@ int main(int argc, char **argv)
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+
   SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
   SDL_Window *window = SDL_CreateWindow(
     "Dear ImGui SDL2+OpenGL3 example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 800, window_flags);
@@ -84,38 +85,36 @@ int main(int argc, char **argv)
   ImVec4 clear_color = ImVec4(0.30F, 0.50F, 0.40F, 1.00F);
 
   // Vertices coordinates
-  GLfloat vertices[] = {
-    -0.5F,
-    0.0F,
-    0.5F,
-    0.83F,
-    0.70F,
-    0.44F,
-    -0.5F,
-    0.0F,
-    -0.5F,
-    0.83F,
-    0.70F,
-    0.44F,
-    0.5F,
-    0.0F,
-    -0.5F,
-    0.83F,
-    0.70F,
-    0.44F,
-    0.5F,
-    0.0F,
-    0.5F,
-    0.83F,
-    0.70F,
-    0.44F,
-    0.0F,
-    0.8F,
-    0.0F,
-    0.92F,
-    0.86F,
-    0.76F,
-  };
+  GLfloat vertices[] = { -0.5f,
+    0.0f,
+    0.5f,
+    0.83f,
+    0.70f,
+    0.44f,
+    -0.5f,
+    0.0f,
+    -0.5f,
+    0.83f,
+    0.70f,
+    0.44f,
+    0.5f,
+    0.0f,
+    -0.5f,
+    0.83f,
+    0.70f,
+    0.44f,
+    0.5f,
+    0.0f,
+    0.5f,
+    0.83f,
+    0.70f,
+    0.44f,
+    0.0f,
+    0.8f,
+    0.0f,
+    0.92f,
+    0.86f,
+    0.76f };
 
   // Indices for vertices order
   GLuint indices[] = { 0, 1, 2, 0, 2, 3, 0, 1, 4, 1, 2, 4, 2, 3, 4, 3, 0, 4 };
@@ -131,8 +130,8 @@ int main(int argc, char **argv)
   Molviz::gfx::VertexBuffer VBO{ vertices, sizeof(vertices) };
   Molviz::gfx::ElementBuffer EBO{ indices, sizeof(indices) };
 
-  VAO.link_attribute(VBO, 0, 3, GL_FLOAT, 8 * sizeof(float), (void *)0);// position
-  VAO.link_attribute(VBO, 1, 3, GL_FLOAT, 8 * sizeof(float), (void *)(3 * sizeof(float)));// color
+  VAO.link_attribute(VBO, 0, 3, GL_FLOAT, 6 * sizeof(GLfloat), (GLvoid *)0);// position
+  VAO.link_attribute(VBO, 1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(float)));// color
 
   VAO.unbind();
   VBO.unbind();
@@ -147,6 +146,7 @@ int main(int argc, char **argv)
   double delta_time{ 0.0 };
 
   glEnable(GL_DEPTH_TEST);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);// wireframe
 
   // Main loop
   bool done = false;
@@ -190,7 +190,7 @@ int main(int argc, char **argv)
     last = now;
     now = SDL_GetPerformanceCounter();
     delta_time = double((now - last) * 1000) / double(SDL_GetPerformanceFrequency());
-    if (delta_time >= (1 / 60 * 1000)) { rotation += 0.5F; }
+    if (delta_time >= (1000 / 60)) { rotation += 0.5F; }
 
     model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0F, 1.0F, 0.0F));
     view = glm::translate(view, glm::vec3(0.0f, -0.5F, -2.0F));
@@ -209,6 +209,9 @@ int main(int argc, char **argv)
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     SDL_GL_SwapWindow(window);
+
+    // FPS limiting
+    SDL_Delay(1000 / 60);
   }
 
   // Cleanup
