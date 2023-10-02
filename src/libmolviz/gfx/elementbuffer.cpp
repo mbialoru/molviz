@@ -2,11 +2,11 @@
 
 using namespace Molviz::gfx;
 
-ElementBuffer::ElementBuffer(GLuint *tp_indices, GLsizeiptr t_size)
+ElementBuffer::ElementBuffer(std::vector<GLuint> &tr_indices)
 {
   glGenBuffers(1, &id);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, t_size, tp_indices, GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, tr_indices.size() * sizeof(GLuint), tr_indices.data(), GL_STATIC_DRAW);
 };
 
 ElementBuffer::~ElementBuffer() { cleanup(); }

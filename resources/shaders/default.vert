@@ -1,19 +1,20 @@
 #version 330 core
 
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aColor;
+layout (location = 0) in vec3 t_position;
+layout (location = 1) in vec3 t_normal;
+layout (location = 2) in vec3 t_color;
 
+out vec3 current_position;
+out vec3 normal;
 out vec3 color;
 
-uniform float scale;
-
-// matrices needed for 3D viewing with perspective
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 proj;
+uniform mat4 camera_matrix;
+uniform mat4 model_matrix;
 
 void main()
 {
-	gl_Position = proj * view * model * vec4(aPos, 1.0);
-	color = aColor;
+	current_position = vec3(model_matrix * vec4(t_position, 1.0f));
+	normal = t_normal;
+	color = t_color;
+	gl_Position = camera_matrix * vec4(current_position, 1.0);
 }

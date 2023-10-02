@@ -11,15 +11,20 @@
 #include <imgui_impl_sdl2.h>
 #include <spdlog/spdlog.h>
 
-#include "gfx/elementbuffer.hpp"
-#include "gfx/shader.hpp"
-#include "gfx/vertexarray.hpp"
-#include "gfx/vertexbuffer.hpp"
+#include "gfx/mesh.hpp"
+
+using Molviz::gfx::Vertex;
+using Molviz::gfx::Shader;
+using Molviz::gfx::Mesh;
+using Molviz::gfx::Camera;
 
 // Main code
 int main(int argc, char **argv)
 {
-  // Setup SDL
+  // set loglevel
+  spdlog::set_level(spdlog::level::debug);
+
+  // setup SDL
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0) {
     spdlog::error("SDL initialization error: {}", SDL_GetError());
     return -1;
@@ -82,71 +87,78 @@ int main(int argc, char **argv)
   ImGui_ImplOpenGL3_Init(glsl_version);
 
   // Our state
-  ImVec4 clear_color = ImVec4(0.30F, 0.50F, 0.40F, 1.00F);
+  ImVec4 clear_color = ImVec4(1.00F, 1.00F, 1.00F, 1.00F);
 
   // Vertices coordinates
-  GLfloat vertices[] = { -0.5f,
-    0.0f,
-    0.5f,
-    0.83f,
-    0.70f,
-    0.44f,
-    -0.5f,
-    0.0f,
-    -0.5f,
-    0.83f,
-    0.70f,
-    0.44f,
-    0.5f,
-    0.0f,
-    -0.5f,
-    0.83f,
-    0.70f,
-    0.44f,
-    0.5f,
-    0.0f,
-    0.5f,
-    0.83f,
-    0.70f,
-    0.44f,
-    0.0f,
-    0.8f,
-    0.0f,
-    0.92f,
-    0.86f,
-    0.76f };
+  Vertex model_vertices_raw[] = {
+    Vertex{ glm::vec3(-1.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f) },
+    Vertex{ glm::vec3(-1.0f, 0.0f, -1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f) },
+    Vertex{ glm::vec3(1.0f, 0.0f, -1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f) },
+    Vertex{ glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f) }
+  };
 
-  // Indices for vertices order
-  GLuint indices[] = { 0, 1, 2, 0, 2, 3, 0, 1, 4, 1, 2, 4, 2, 3, 4, 3, 0, 4 };
+  // Indices for model_vertices order
+  GLuint model_indices_raw[] = { 0, 1, 2, 0, 2, 3 };
 
-  std::filesystem::path fragment_shader{ "../resources/shaders/default.frag" };
-  std::filesystem::path vertex_shader{ "../resources/shaders/default.vert" };
+  Vertex light_vertices_raw[] = { Vertex{ glm::vec3(-0.1f, -0.1f, 0.1f) },
+    Vertex{ glm::vec3(-0.1f, -0.1f, -0.1f) },
+    Vertex{ glm::vec3(0.1f, -0.1f, -0.1f) },
+    Vertex{ glm::vec3(0.1f, -0.1f, 0.1f) },
+    Vertex{ glm::vec3(-0.1f, 0.1f, 0.1f) },
+    Vertex{ glm::vec3(-0.1f, 0.1f, -0.1f) },
+    Vertex{ glm::vec3(0.1f, 0.1f, -0.1f) },
+    Vertex{ glm::vec3(0.1f, 0.1f, 0.1f) } };
 
-  Molviz::gfx::Shader shader_program{ vertex_shader.c_str(), fragment_shader.c_str() };
+  GLuint light_indices_raw[] = {
+    0, 1, 2, 0, 2, 3, 0, 4, 7, 0, 7, 3, 3, 7, 6, 3, 6, 2, 2, 6, 5, 2, 5, 1, 1, 5, 4, 1, 4, 0, 4, 5, 6, 4, 6, 7
+  };
 
-  Molviz::gfx::VertexArray VAO;
-  VAO.bind();
+  std::filesystem::path model_fragment_shader{ "../resources/shaders/default.frag" };
+  std::filesystem::path model_vertex_shader{ "../resources/shaders/default.vert" };
 
-  Molviz::gfx::VertexBuffer VBO{ vertices, sizeof(vertices) };
-  Molviz::gfx::ElementBuffer EBO{ indices, sizeof(indices) };
+  std::filesystem::path light_fragment_shader{ "../resources/shaders/light.frag" };
+  std::filesystem::path light_vertex_shader{ "../resources/shaders/light.vert" };
 
-  VAO.link_attribute(VBO, 0, 3, GL_FLOAT, 6 * sizeof(GLfloat), (GLvoid *)0);// position
-  VAO.link_attribute(VBO, 1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(float)));// color
+  Shader model_shader{ model_vertex_shader.c_str(), model_fragment_shader.c_str() };
+  Shader light_shader{ light_vertex_shader.c_str(), light_fragment_shader.c_str() };
 
-  VAO.unbind();
-  VBO.unbind();
-  EBO.unbind();
+  std::vector<Vertex> model_vertices(
+    model_vertices_raw, model_vertices_raw + sizeof(model_vertices_raw) / sizeof(Vertex));
+  std::vector<GLuint> model_indices(model_indices_raw, model_indices_raw + sizeof(model_indices_raw) / sizeof(GLuint));
+  std::vector<Vertex> light_vertices(
+    light_vertices_raw, light_vertices_raw + sizeof(light_vertices_raw) / sizeof(Vertex));
+  std::vector<GLuint> light_indices(light_indices_raw, light_indices_raw + sizeof(light_indices_raw) / sizeof(GLuint));
 
-  int uni_id{ glGetUniformLocation(shader_program.id, "scale") };
+  // create meshes
+  Mesh model_mesh(model_vertices, model_indices);
+  Mesh light_mesh(light_vertices, light_indices);
 
-  // rotation
-  float rotation{ 0.0F };
-  Uint64 now{ SDL_GetPerformanceCounter() };
-  Uint64 last{ 0 };
-  double delta_time{ 0.0 };
+  glm::vec4 light_color{ 0.5F, 0.5F, 0.5F, 0.5F };
+  glm::vec3 light_position{ 0.5F, 0.5F, 0.5F };
+  glm::mat4 light_model = glm::mat4(1.0F);
+  light_model = glm::translate(light_model, light_position);
+
+  glm::vec3 object_position{ 0.0F, 0.0F, 0.0F };
+  glm::mat4 object_model = glm::mat4(1.0F);
+  object_model = glm::translate(object_model, object_position);
+
+  light_shader.activate();
+  glUniformMatrix4fv(glGetUniformLocation(light_shader.id, "model_matrix"), 1, GL_FALSE, glm::value_ptr(light_model));
+  glUniform4f(
+    glGetUniformLocation(light_shader.id, "light_color"), light_color.r, light_color.g, light_color.b, light_color.a);
+
+  model_shader.activate();
+  glUniformMatrix4fv(glGetUniformLocation(model_shader.id, "model_matrix"), 1, GL_FALSE, glm::value_ptr(object_model));
+  glUniform4f(
+    glGetUniformLocation(model_shader.id, "t_light_color"), light_color.r, light_color.g, light_color.b, light_color.a);
+  glUniform3f(
+    glGetUniformLocation(model_shader.id, "t_light_position"), light_position.x, light_position.y, light_position.z);
 
   glEnable(GL_DEPTH_TEST);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);// wireframe
+
+  // create camera
+  Camera camera((int)io.DisplaySize.x, (int)io.DisplaySize.y, glm::vec3(0.0F, 0.0F, 2.0F));
 
   // Main loop
   bool done = false;
@@ -180,38 +192,13 @@ int main(int argc, char **argv)
     glClearColor(
       clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    shader_program.activate();
-
-    glm::mat4 model{ glm::mat4(1.0F) };
-    glm::mat4 view{ glm::mat4(1.0F) };
-    glm::mat4 proj{ glm::mat4(1.0F) };
-
-    // rotation
-    last = now;
-    now = SDL_GetPerformanceCounter();
-    delta_time = double((now - last) * 1000) / double(SDL_GetPerformanceFrequency());
-    if (delta_time >= (1000 / 60)) { rotation += 0.5F; }
-
-    model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0F, 1.0F, 0.0F));
-    view = glm::translate(view, glm::vec3(0.0f, -0.5F, -2.0F));
-    proj = glm::perspective(glm::radians(45.0F), float(io.DisplaySize.x / io.DisplaySize.y), 0.1F, 100.0F);
-
-    int model_location{ glGetUniformLocation(shader_program.id, "model") };
-    glUniformMatrix4fv(model_location, 1, GL_FALSE, glm::value_ptr(model));
-    int view_location{ glGetUniformLocation(shader_program.id, "view") };
-    glUniformMatrix4fv(view_location, 1, GL_FALSE, glm::value_ptr(view));
-    int proj_location{ glGetUniformLocation(shader_program.id, "proj") };
-    glUniformMatrix4fv(proj_location, 1, GL_FALSE, glm::value_ptr(proj));
-
-    glUniform1f(uni_id, 0.5F);
-    VAO.bind();
-    glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
+    while (SDL_PollEvent(&event)) { camera.handle_inputs(event); }
+    camera.update_matrix(45.0F, 0.1F, 100.0F);
+    model_mesh.draw(model_shader, camera);
+    light_mesh.draw(light_shader, camera);
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     SDL_GL_SwapWindow(window);
-
-    // FPS limiting
-    SDL_Delay(1000 / 60);
   }
 
   // Cleanup
@@ -219,10 +206,8 @@ int main(int argc, char **argv)
   ImGui_ImplSDL2_Shutdown();
   ImGui::DestroyContext();
 
-  VAO.cleanup();
-  VBO.cleanup();
-  EBO.cleanup();
-  shader_program.cleanup();
+  model_shader.cleanup();
+  light_shader.cleanup();
 
   SDL_GL_DeleteContext(gl_context);
   SDL_DestroyWindow(window);

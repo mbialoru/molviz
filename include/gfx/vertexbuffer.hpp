@@ -4,13 +4,22 @@
 #pragma once
 
 #include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <vector>
 
 namespace Molviz::gfx {
+
+struct Vertex
+{
+  glm::vec3 position;
+  glm::vec3 normal;
+  glm::vec3 color;
+};
 
 class VertexBuffer
 {
 public:
-  VertexBuffer(GLfloat *tp_vertices, GLsizeiptr t_size);
+  VertexBuffer(std::vector<Vertex> &tr_vertices);
   ~VertexBuffer();
 
   void bind();
@@ -18,8 +27,6 @@ public:
   void cleanup();
 
   GLuint id;
-
-private:
 };
 
 }// namespace Molviz::gfx
