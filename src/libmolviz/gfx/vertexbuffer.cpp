@@ -2,11 +2,11 @@
 
 using namespace Molviz::gfx;
 
-VertexBuffer::VertexBuffer(GLfloat *tp_vertices, GLsizeiptr t_size)
+VertexBuffer::VertexBuffer(std::vector<Vertex> &tr_vertices)
 {
   glGenBuffers(1, &id);
   glBindBuffer(GL_ARRAY_BUFFER, id);
-  glBufferData(GL_ARRAY_BUFFER, t_size, tp_vertices, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, tr_vertices.size() * sizeof(Vertex), tr_vertices.data(), GL_STATIC_DRAW);
 };
 
 VertexBuffer::~VertexBuffer() { cleanup(); }

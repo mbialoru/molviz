@@ -17,7 +17,9 @@ target_link_system_libraries(
   PRIVATE
   fmt::fmt
   spdlog::spdlog
-  GLEW::GLEW)
+  GLEW::GLEW
+  glm::glm
+  SDL2)
 
 target_link_libraries(lib${CMAKE_PROJECT_NAME} PRIVATE project_options project_warnings)
 

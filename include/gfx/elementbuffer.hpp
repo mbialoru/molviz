@@ -4,13 +4,14 @@
 #pragma once
 
 #include <GL/glew.h>
+#include <vector>
 
 namespace Molviz::gfx {
 
 class ElementBuffer
 {
 public:
-  ElementBuffer(GLuint *tp_indices, GLsizeiptr t_size);
+  ElementBuffer(std::vector<GLuint> &tr_indices);
   ~ElementBuffer();
 
   void bind();
