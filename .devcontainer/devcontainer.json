@@ -36,7 +36,8 @@
 		"ms-python.vscode-pylance",
 		"mutantdino.resourcemonitor",
 		"cheshirekow.cmake-format",
-		"xaver.clang-format"
+		"xaver.clang-format",
+		"GeForceLegend.vscode-glsl"
 	],
 	"remoteEnv": {
         "DISPLAY": ":0"
