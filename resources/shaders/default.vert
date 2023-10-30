@@ -4,6 +4,7 @@ layout (location = 0) in vec3 t_position;
 layout (location = 1) in vec3 t_normal;
 layout (location = 2) in vec3 t_color;
 
+// NOTE: keep these names 
 out vec3 current_position;
 out vec3 normal;
 out vec3 color;

@@ -91,10 +91,10 @@ int main(int argc, char **argv)
 
   // Vertices coordinates
   Vertex model_vertices_raw[] = {
-    Vertex{ glm::vec3(-1.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f) },
-    Vertex{ glm::vec3(-1.0f, 0.0f, -1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f) },
-    Vertex{ glm::vec3(1.0f, 0.0f, -1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f) },
-    Vertex{ glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f) }
+    Vertex{ glm::vec3(-1.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.5f, 1.0f) },
+    Vertex{ glm::vec3(-1.0f, 0.0f, -1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.5f, 1.0f) },
+    Vertex{ glm::vec3(1.0f, 0.0f, -1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.5f, 1.0f) },
+    Vertex{ glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.5f, 1.0f) }
   };
 
   // Indices for model_vertices order
@@ -155,14 +155,20 @@ int main(int argc, char **argv)
     glGetUniformLocation(model_shader.id, "t_light_position"), light_position.x, light_position.y, light_position.z);
 
   glEnable(GL_DEPTH_TEST);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);// wireframe
+  // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);// wireframe
 
   // create camera
   Camera camera((int)io.DisplaySize.x, (int)io.DisplaySize.y, glm::vec3(0.0F, 0.0F, 2.0F));
 
+  uint32_t last_frametime;
+  uint32_t this_frametime;
+
   // Main loop
   bool done = false;
   while (!done) {
+    last_frametime = this_frametime;
+    this_frametime = SDL_GetTicks();
+
     // Poll and handle events (inputs, window resize, etc.)
     // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your
     // inputs.
@@ -199,6 +205,9 @@ int main(int argc, char **argv)
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     SDL_GL_SwapWindow(window);
+
+    // fps limiter
+    if (this_frametime - last_frametime < 1000 / 60) SDL_Delay(1000 / 60 - this_frametime + last_frametime);
   }
 
   // Cleanup
