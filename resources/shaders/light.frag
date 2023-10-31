@@ -1,10 +1,10 @@
 #version 330 core
 
-out vec4 fragment_color;
+uniform vec4 u_light_color;
 
-uniform vec4 light_color;
+out vec4 fragment_color;
 
 void main()
 {
-	fragment_color = light_color;
+	fragment_color = u_light_color;
 }

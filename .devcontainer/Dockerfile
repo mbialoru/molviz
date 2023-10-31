@@ -60,7 +60,7 @@ RUN apt-get install -y --no-install-recommends gcc-${GCC_VER} g++-${GCC_VER} gdb
 RUN update-alternatives --install /usr/bin/gcc gcc $(which gcc-${GCC_VER}) 100
 RUN update-alternatives --install /usr/bin/g++ g++ $(which g++-${GCC_VER}) 100
 
-ARG LLVM_VER="15"
+ARG LLVM_VER="16"
 # Add clang-${LLVM_VER}
 RUN apt-get install -y --no-install-recommends \
     clang-${LLVM_VER} lldb-${LLVM_VER} lld-${LLVM_VER} clangd-${LLVM_VER} \

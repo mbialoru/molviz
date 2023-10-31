@@ -1,11 +1,12 @@
 #version 330 core
 
-layout (location = 0) in vec3 t_position;
+// inputs
+layout (location = 0) in vec3 i_position;
 
-uniform mat4 model_matrix;
-uniform mat4 camera_matrix;
+uniform mat4 u_model_matrix;
+uniform mat4 u_camera_matrix;
 
 void main()
 {
-	gl_Position = camera_matrix * model_matrix * vec4(t_position, 1.0f);
+	gl_Position = u_camera_matrix * u_model_matrix * vec4(i_position, 1.0f);
 }
