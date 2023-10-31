@@ -12,6 +12,15 @@ Model::Model(const char *tp_file)
   m_json = nlohmann::json::parse(file_data);
   mp_file = tp_file;
   m_data = get_data();
+
+  traverse_node(0);
+}
+
+void Model::draw(Shader &tr_shader, Camera &tr_camera)
+{
+  for (std::size_t i{ 0 }; i < m_meshes.size(); ++i) {
+    m_meshes[i].Mesh::draw(tr_shader, tr_camera, m_matrices_meshes[i]);
+  }
 }
 
 std::vector<unsigned char> Model::get_data()
@@ -105,6 +114,112 @@ std::vector<GLuint> Model::get_indices(nlohmann::json t_accessor)
       indices.push_back(static_cast<GLuint>(value));
     }
   }
-
   return indices;
+}
+
+std::vector<Vertex> Model::assemble_vertices(std::vector<glm::vec3> t_positions, std::vector<glm::vec3> t_normals)
+{
+  // TODO: color here is fullbright white
+  std::vector<Vertex> vertices;
+  for (std::size_t i{ 0 }; i < t_positions.size(); ++i) {
+    vertices.push_back(Vertex(t_positions[i], t_normals[i], glm::vec3(1.0F, 1.0F, 1.0F)));
+  }
+}
+
+std::vector<glm::vec2> Model::group_floats_vec2(std::vector<float> t_floats)
+{
+  std::vector<glm::vec2> vectors;
+  for (std::size_t i{ 0 }; i < t_floats.size(); i) { vectors.push_back(glm::vec2(t_floats[i++], t_floats[i++])); }
+  return vectors;
+}
+
+std::vector<glm::vec3> Model::group_floats_vec3(std::vector<float> t_floats)
+{
+  std::vector<glm::vec3> vectors;
+  for (std::size_t i{ 0 }; i < t_floats.size(); i) {
+    vectors.push_back(glm::vec3(t_floats[i++], t_floats[i++], t_floats[i++]));
+  }
+  return vectors;
+}
+
+std::vector<glm::vec4> Model::group_floats_vec4(std::vector<float> t_floats)
+{
+  std::vector<glm::vec4> vectors;
+  for (std::size_t i{ 0 }; i < t_floats.size(); i) {
+    vectors.push_back(glm::vec4(t_floats[i++], t_floats[i++], t_floats[i++], t_floats[i++]));
+  }
+  return vectors;
+}
+
+void Model::load_mesh(unsigned int t_mesh_index)
+{
+  unsigned int position_access_index{ m_json["meshes"][t_mesh_index]["primitives"][0]["attributes"]["POSITION"] };
+  unsigned int normal_access_index{ m_json["meshes"][t_mesh_index]["primitives"][0]["attributes"]["NORMAL"] };
+  unsigned int index_access_index{ m_json["meshes"][t_mesh_index]["primitives"][0]["indices"] };
+
+  std::vector<float> position_vector{ get_floats(m_json["accessors"][position_access_index]) };
+  std::vector<glm::vec3> positions{ group_floats_vec3(position_vector) };
+  std::vector<float> normal_vector{ get_floats(m_json["accessors"][normal_access_index]) };
+  std::vector<glm::vec3> normals{ group_floats_vec3(normal_vector) };
+
+  std::vector<Vertex> vertices{ assemble_vertices(positions, normals) };
+  std::vector<GLuint> indices{ get_indices(m_json["accessors"][index_access_index]) };
+
+  m_meshes.push_back(Mesh(vertices, indices));
+}
+
+void Model::traverse_node(unsigned int t_next_node, glm::mat4 t_matrix)
+{
+  nlohmann::json node{ m_json["nodes"][t_next_node] };
+  glm::vec3 translation{ glm::vec3(0.0F, 0.0F, 0.0F) };
+
+  if (node.find("translation") != node.end()) {
+    // TODO: this loop is pointless and can overflow
+    float translation_values[3];
+    for (std::size_t i{ 0 }; i < node["translation"].size(); ++i) { translation_values[i] = (node["translation"][i]); }
+    translation = glm::make_vec3(translation_values);
+  }
+
+  glm::quat rotation{ glm::quat(1.0F, 0.0F, 0.0F, 0.0F) };
+  if (node.find("rotation") != node.end()) {
+    float rotation_values[] = { node["rotation"][3], node["rotation"][0], node["rotation"][1], node["rotation"][2] };
+    rotation = glm::make_quat(rotation_values);
+  }
+
+  glm::vec3 scale{ glm::vec3(1.0F, 1.0F, 1.0F) };
+  if (node.find("scale") != node.end()) {
+    float scale_values[3];
+    for (std::size_t i{ 0 }; i < node["scale"].size(); ++i) { scale_values[i] = (node["scale"[i]]); }
+    scale = glm::make_vec3(scale_values);
+  }
+
+  glm::mat4 matrix_node{ glm::mat4(1.0F) };
+  if (node.find("matrix") != node.end()) {
+    float matrix_values[16];
+    for (std::size_t i{ 0 }; i < node["matrix"].size(); ++i) { matrix_values[i] = (node["matrix"][i]); }
+    matrix_node = glm::make_mat4(matrix_values);
+  }
+
+  glm::mat4 trans{ glm::mat4(1.0F) };
+  glm::mat4 rot{ glm::mat4(1.0F) };
+  glm::mat4 sca{ glm::mat4(1.0F) };
+
+  trans = glm::translate(trans, translation);
+  rot = glm::mat4_cast(rotation);
+  sca = glm::scale(sca, scale);
+
+  glm::mat4 matrix_next_node{ t_matrix * matrix_node * trans * rot * sca };
+
+  if (node.find("mesh") != node.end()) {
+    m_translation_meshes.push_back(translation);
+    m_rotation_meshes.push_back(rotation);
+    m_scale_meshes.push_back(scale);
+    m_matrices_meshes.push_back(matrix_next_node);
+
+    load_mesh(node["mesh"]);
+  }
+
+  if (node.find("children") != node.end()) {
+    for (std::size_t i{ 0 }; i < node["children"].size(); ++i) { traverse_node(node["children"][i], matrix_next_node); }
+  }
 }
