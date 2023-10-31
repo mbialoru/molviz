@@ -121,8 +121,8 @@ int main(int argc, char **argv)
   std::filesystem::path light_fragment_shader{ "../resources/shaders/light.frag" };
   std::filesystem::path light_vertex_shader{ "../resources/shaders/light.vert" };
 
-  Shader model_shader{ model_vertex_shader.c_str(), model_fragment_shader.c_str() };
-  Shader light_shader{ light_vertex_shader.c_str(), light_fragment_shader.c_str() };
+  Shader model_shader{ model_vertex_shader, model_fragment_shader };
+  Shader light_shader{ light_vertex_shader, light_fragment_shader };
 
   std::vector<Vertex> model_vertices(
     model_vertices_raw, model_vertices_raw + sizeof(model_vertices_raw) / sizeof(Vertex));
@@ -145,16 +145,17 @@ int main(int argc, char **argv)
   object_model = glm::translate(object_model, object_position);
 
   light_shader.activate();
-  glUniformMatrix4fv(glGetUniformLocation(light_shader.id, "model_matrix"), 1, GL_FALSE, glm::value_ptr(light_model));
+  glUniformMatrix4fv(glGetUniformLocation(light_shader.id, "u_model_matrix"), 1, GL_FALSE, glm::value_ptr(light_model));
   glUniform4f(
-    glGetUniformLocation(light_shader.id, "light_color"), light_color.r, light_color.g, light_color.b, light_color.a);
+    glGetUniformLocation(light_shader.id, "u_light_color"), light_color.r, light_color.g, light_color.b, light_color.a);
 
   model_shader.activate();
-  glUniformMatrix4fv(glGetUniformLocation(model_shader.id, "model_matrix"), 1, GL_FALSE, glm::value_ptr(object_model));
+  glUniformMatrix4fv(
+    glGetUniformLocation(model_shader.id, "u_model_matrix"), 1, GL_FALSE, glm::value_ptr(object_model));
   glUniform4f(
-    glGetUniformLocation(model_shader.id, "t_light_color"), light_color.r, light_color.g, light_color.b, light_color.a);
+    glGetUniformLocation(model_shader.id, "u_light_color"), light_color.r, light_color.g, light_color.b, light_color.a);
   glUniform3f(
-    glGetUniformLocation(model_shader.id, "t_light_position"), light_position.x, light_position.y, light_position.z);
+    glGetUniformLocation(model_shader.id, "u_light_position"), light_position.x, light_position.y, light_position.z);
 
   glEnable(GL_DEPTH_TEST);
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);// wireframe

@@ -1,21 +1,23 @@
 #version 330 core
 
-layout (location = 0) in vec3 t_position;
-layout (location = 1) in vec3 t_normal;
-layout (location = 2) in vec3 t_color;
+// inputs
+layout (location = 0) in vec3 i_position;
+layout (location = 1) in vec3 i_normal;
+layout (location = 2) in vec3 i_color;
 
-// NOTE: keep these names 
-out vec3 current_position;
-out vec3 normal;
-out vec3 color;
+// NOTE: keep these names consistent between shaders
+// NOTE: these variables are passed to fragment shader
+out vec3 c_current_position;
+out vec3 c_normal;
+out vec3 c_color;
 
-uniform mat4 camera_matrix;
-uniform mat4 model_matrix;
+uniform mat4 u_camera_matrix;
+uniform mat4 u_model_matrix;
 
 void main()
 {
-	current_position = vec3(model_matrix * vec4(t_position, 1.0f));
-	normal = t_normal;
-	color = t_color;
-	gl_Position = camera_matrix * vec4(current_position, 1.0);
+	c_current_position = vec3(u_model_matrix * vec4(i_position, 1.0f));
+	c_normal = i_normal;
+	c_color = i_color;
+	gl_Position = u_camera_matrix * vec4(c_current_position, 1.0);
 }
