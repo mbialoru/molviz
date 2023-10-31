@@ -14,6 +14,9 @@ std::string Molviz::gfx::shader_type_to_string(const ShaderType t_type)
   case ShaderType::VERTEX:
     return { "VERTEX" };
     break;
+  default:
+    throw std::invalid_argument("invalid shader type");
+    break;
   }
 }
 
@@ -57,7 +60,7 @@ Shader::Shader(const std::filesystem::path &tr_vertex_shader, const std::filesys
   glDeleteShader(fragment_shader);
 
   spdlog::info(
-    "Initialized shader program {} {}", tr_vertex_shader.filename().string(), tr_fragment_shader.filename().string());
+    "initialized shader program {} {}", tr_vertex_shader.filename().string(), tr_fragment_shader.filename().string());
 }
 
 Shader::~Shader() { cleanup(); }
@@ -77,14 +80,14 @@ void Shader::compile_errors(GLuint t_shader, const ShaderType t_type)
     if (has_compiled == GL_FALSE) {
       glGetShaderInfoLog(t_shader, BUFFER_SIZE, nullptr, message_buffer.data());
       std::string message{ message_buffer.begin(), message_buffer.end() };
-      spdlog::error("Shader compilation error for: {} {}", shader_type_to_string(t_type), message);
+      spdlog::error("shader compilation error for: {} {}", shader_type_to_string(t_type), message);
     }
   } else {
     glGetProgramiv(t_shader, GL_LINK_STATUS, &has_compiled);
     if (has_compiled == GL_FALSE) {
       glGetProgramInfoLog(t_shader, BUFFER_SIZE, nullptr, message_buffer.data());
       std::string message{ message_buffer.begin(), message_buffer.end() };
-      spdlog::error("Shader linking error for {} {}", shader_type_to_string(t_type), message);
+      spdlog::error("shader linking error for {} {}", shader_type_to_string(t_type), message);
     }
   }
 }

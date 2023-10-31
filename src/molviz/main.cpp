@@ -70,7 +70,7 @@ int main(int argc, char **argv)
   SDL_GL_MakeCurrent(window, gl_context);
 
   // Use Vsync
-  if (SDL_GL_SetSwapInterval(1) < 0) { spdlog::warn("Unable to set VSync! SDL Error: {}", SDL_GetError()); }
+  if (SDL_GL_SetSwapInterval(1) < 0) { spdlog::warn("unable to set VSync! SDL error: {}", SDL_GetError()); }
 
   // Setup Dear ImGui context
   IMGUI_CHECKVERSION();
