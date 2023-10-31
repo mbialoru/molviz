@@ -26,7 +26,7 @@ std::string Molviz::file_contents_to_string(std::filesystem::path t_file)
     in_stream.read(file_content.data(), file_content.size());
     in_stream.close();
   } else {
-    spdlog::error("Could not open {}", t_file.string());
+    spdlog::error("could not open {}", t_file.string());
   }
 
   return file_content;
