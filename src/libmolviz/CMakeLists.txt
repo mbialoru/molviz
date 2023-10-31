@@ -17,10 +17,11 @@ target_link_system_libraries(
   lib${CMAKE_PROJECT_NAME}
   PRIVATE
   fmt::fmt
-  spdlog::spdlog
   GLEW::GLEW
   glm::glm
-  SDL2)
+  nlohmann_json::nlohmann_json
+  SDL2
+  spdlog::spdlog)
 
 target_link_libraries(lib${CMAKE_PROJECT_NAME} PRIVATE project_options project_warnings)
 
