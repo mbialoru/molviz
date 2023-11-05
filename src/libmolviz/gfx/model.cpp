@@ -43,9 +43,9 @@ std::vector<float> Model::get_floats(nlohmann::json t_accessor)
 {
   std::vector<float> float_vector;
 
-  unsigned int buffer_view_index{ t_accessor.value("bufferView", 1) };
+  unsigned int buffer_view_index = t_accessor.value("bufferView", 1);
   unsigned int count{ t_accessor["count"] };
-  unsigned int access_byte_offset{ t_accessor.value("byteOffset", 0) };
+  unsigned int access_byte_offset = t_accessor.value("byteOffset", 0);
 
   std::string type{ t_accessor["type"] };
 
@@ -82,10 +82,10 @@ std::vector<GLuint> Model::get_indices(nlohmann::json t_accessor)
 {
   std::vector<GLuint> indices;
 
-  unsigned int buffer_vier_index{ t_accessor.value("bufferView", 0) };
+  unsigned int buffer_vier_index = t_accessor.value("bufferView", 0);
   unsigned int count{ t_accessor["count"] };
-  unsigned int access_byte_offset{ t_accessor.value("byteOffset", 0) };
-  unsigned int component_type{ t_accessor["componentType"] };
+  unsigned int access_byte_offset = t_accessor.value("byteOffset", 0);
+  unsigned int component_type = t_accessor["componentType"];
 
   nlohmann::json buffer_view{ m_json["bufferViews"][buffer_vier_index] };
   unsigned int byte_offset{ buffer_view["byteOffset"] };

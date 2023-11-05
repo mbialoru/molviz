@@ -11,11 +11,12 @@
 #include <imgui_impl_sdl2.h>
 #include <spdlog/spdlog.h>
 
-#include "gfx/mesh.hpp"
+#include "gfx/model.hpp"
 
 using Molviz::gfx::Vertex;
 using Molviz::gfx::Shader;
 using Molviz::gfx::Mesh;
+using Molviz::gfx::Model;
 using Molviz::gfx::Camera;
 
 // Main code
@@ -76,7 +77,6 @@ int main(int argc, char **argv)
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO &io = ImGui::GetIO();
-  (void)io;
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;// Enable Keyboard Controls
 
   // Setup Dear ImGui style
@@ -91,77 +91,32 @@ int main(int argc, char **argv)
 
   spdlog::debug("imgui configured");
 
-  // Vertices coordinates
-  Vertex model_vertices_raw[] = {
-    Vertex{ glm::vec3(-1.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.5f, 1.0f) },
-    Vertex{ glm::vec3(-1.0f, 0.0f, -1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.5f, 1.0f) },
-    Vertex{ glm::vec3(1.0f, 0.0f, -1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.5f, 1.0f) },
-    Vertex{ glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.5f, 1.0f) }
-  };
-
-  // Indices for model_vertices order
-  GLuint model_indices_raw[] = { 0, 1, 2, 0, 2, 3 };
-
-  Vertex light_vertices_raw[] = { Vertex{ glm::vec3(-0.1f, -0.1f, 0.1f) },
-    Vertex{ glm::vec3(-0.1f, -0.1f, -0.1f) },
-    Vertex{ glm::vec3(0.1f, -0.1f, -0.1f) },
-    Vertex{ glm::vec3(0.1f, -0.1f, 0.1f) },
-    Vertex{ glm::vec3(-0.1f, 0.1f, 0.1f) },
-    Vertex{ glm::vec3(-0.1f, 0.1f, -0.1f) },
-    Vertex{ glm::vec3(0.1f, 0.1f, -0.1f) },
-    Vertex{ glm::vec3(0.1f, 0.1f, 0.1f) } };
-
-  GLuint light_indices_raw[] = {
-    0, 1, 2, 0, 2, 3, 0, 4, 7, 0, 7, 3, 3, 7, 6, 3, 6, 2, 2, 6, 5, 2, 5, 1, 1, 5, 4, 1, 4, 0, 4, 5, 6, 4, 6, 7
-  };
-
   std::filesystem::path model_fragment_shader{ "../resources/shaders/default.frag" };
   std::filesystem::path model_vertex_shader{ "../resources/shaders/default.vert" };
 
-  std::filesystem::path light_fragment_shader{ "../resources/shaders/light.frag" };
-  std::filesystem::path light_vertex_shader{ "../resources/shaders/light.vert" };
-
-  Shader model_shader{ model_vertex_shader, model_fragment_shader };
-  Shader light_shader{ light_vertex_shader, light_fragment_shader };
-
-  std::vector<Vertex> model_vertices(
-    model_vertices_raw, model_vertices_raw + sizeof(model_vertices_raw) / sizeof(Vertex));
-  std::vector<GLuint> model_indices(model_indices_raw, model_indices_raw + sizeof(model_indices_raw) / sizeof(GLuint));
-  std::vector<Vertex> light_vertices(
-    light_vertices_raw, light_vertices_raw + sizeof(light_vertices_raw) / sizeof(Vertex));
-  std::vector<GLuint> light_indices(light_indices_raw, light_indices_raw + sizeof(light_indices_raw) / sizeof(GLuint));
-
-  // create meshes
-  Mesh model_mesh(model_vertices, model_indices);
-  Mesh light_mesh(light_vertices, light_indices);
+  Shader shader_program{ model_vertex_shader, model_fragment_shader };
+  shader_program.activate();
 
   glm::vec4 light_color{ 0.5F, 0.5F, 0.5F, 0.5F };
-  glm::vec3 light_position{ 0.5F, 0.5F, 0.5F };
-  glm::mat4 light_model = glm::mat4(1.0F);
-  light_model = glm::translate(light_model, light_position);
-
-  glm::vec3 object_position{ 0.0F, 0.0F, 0.0F };
-  glm::mat4 object_model = glm::mat4(1.0F);
-  object_model = glm::translate(object_model, object_position);
-
-  light_shader.activate();
-  glUniformMatrix4fv(glGetUniformLocation(light_shader.id, "u_model_matrix"), 1, GL_FALSE, glm::value_ptr(light_model));
-  glUniform4f(
-    glGetUniformLocation(light_shader.id, "u_light_color"), light_color.r, light_color.g, light_color.b, light_color.a);
-
-  model_shader.activate();
-  glUniformMatrix4fv(
-    glGetUniformLocation(model_shader.id, "u_model_matrix"), 1, GL_FALSE, glm::value_ptr(object_model));
-  glUniform4f(
-    glGetUniformLocation(model_shader.id, "u_light_color"), light_color.r, light_color.g, light_color.b, light_color.a);
+  glm::vec3 light_position{ 0.0F, 0.0F, 1.0F };
+  glUniform4f(glGetUniformLocation(shader_program.id, "u_light_color"),
+    light_color.r,
+    light_color.g,
+    light_color.b,
+    light_color.a);
   glUniform3f(
-    glGetUniformLocation(model_shader.id, "u_light_position"), light_position.x, light_position.y, light_position.z);
+    glGetUniformLocation(shader_program.id, "u_light_position"), light_position.x, light_position.y, light_color.z);
 
+  // clipping of overlapping vertices, depth buffer or "z buffer"
   glEnable(GL_DEPTH_TEST);
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);// wireframe
 
   // create camera
-  Camera camera((int)io.DisplaySize.x, (int)io.DisplaySize.y, glm::vec3(0.0F, 0.0F, 2.0F));
+  Camera camera(static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y), glm::vec3(0.0F, 0.0F, 0.0F));
+
+  // create models
+  std::filesystem::path model_gltf_file{ "../resources/meshes/cube/Cube.gltf" };
+  Model model(std::filesystem::absolute(model_gltf_file).c_str());
 
   uint32_t last_frametime;
   uint32_t this_frametime;
@@ -188,6 +143,7 @@ int main(int argc, char **argv)
           && event.window.windowID == SDL_GetWindowID(window)) {
         done = true;
       }
+      camera.handle_inputs(event);
     }
 
     // Start the Dear ImGui frame
@@ -197,14 +153,13 @@ int main(int argc, char **argv)
 
     // Rendering
     ImGui::Render();
-    glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+    glViewport(0, 0, static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y));
     glClearColor(
       clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    while (SDL_PollEvent(&event)) { camera.handle_inputs(event); }
+
     camera.update_matrix(45.0F, 0.1F, 100.0F);
-    model_mesh.draw(model_shader, camera);
-    light_mesh.draw(light_shader, camera);
+    model.draw(shader_program, camera);
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     SDL_GL_SwapWindow(window);
@@ -218,8 +173,7 @@ int main(int argc, char **argv)
   ImGui_ImplSDL2_Shutdown();
   ImGui::DestroyContext();
 
-  model_shader.cleanup();
-  light_shader.cleanup();
+  shader_program.cleanup();
 
   SDL_GL_DeleteContext(gl_context);
   SDL_DestroyWindow(window);
