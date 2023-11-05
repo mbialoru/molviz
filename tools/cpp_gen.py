@@ -9,7 +9,7 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-PROJECT_PATH = Path("..")
+INCLUDE_PATH = Path("../include")
 
 
 class convert_to_pathlib(argparse.Action):
@@ -75,7 +75,7 @@ def main(argv: argparse.Namespace):
     else:
         with open(source_path, "wt") as f:
             try:
-                f.write(f'#include "{header_path.relative_to(PROJECT_PATH)}"\n')
+                f.write(f'#include "{header_path.relative_to(INCLUDE_PATH)}"\n')
             except ValueError:
                 f.write(f'#include "{header_path}"\n')
             if namespace := getattr(argv, "namespace"):
