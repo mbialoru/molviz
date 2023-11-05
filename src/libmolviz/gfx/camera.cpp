@@ -3,8 +3,9 @@
 using namespace Molviz::gfx;
 
 Camera::Camera(const int t_width, const int t_height, const glm::vec3 t_position)
-  : orientation(glm::vec3(0.0F, 0.0F, -1.0F)), up(glm::vec3(0.0F, 1.0F, 0.0F)), camera_matrix(glm::mat4(1.0F)),
-    first_click(true), speed(0.1F), sensitivity(100.0F), width(t_width), height(t_height), position(t_position){};
+  : position(t_position), orientation(glm::vec3(0.0F, 0.0F, -1.0F)), up(glm::vec3(0.0F, 1.0F, 0.0F)),
+    camera_matrix(glm::mat4(1.0F)), first_click(true), width(t_width), height(t_height), speed(0.1F),
+    sensitivity(100.0F){};
 
 void Camera::update_matrix(const float t_fov_degrees, const float t_near_plane, const float t_far_plane)
 {
@@ -23,7 +24,7 @@ void Camera::export_matrix(Shader &t_shader, const char *tp_uniform)
   glUniformMatrix4fv(glGetUniformLocation(t_shader.id, tp_uniform), 1, GL_FALSE, glm::value_ptr(camera_matrix));
 }
 
-void Camera::handle_inputs(SDL_Event &tr_event)
+void Camera::handle_inputs(const SDL_Event &tr_event)
 {
   if (tr_event.type == SDL_KEYDOWN) {
     std::string message{ "press: " };
@@ -60,13 +61,13 @@ void Camera::handle_inputs(SDL_Event &tr_event)
 
     case SDLK_LSHIFT:
       message += "LSHIFT";
-      speed = 0.4f;
+      speed = 0.4F;
       break;
     }
 
     spdlog::debug(message);
 
-  } else {
+  } else if (tr_event.type == SDL_KEYUP) {
     std::string message{ "release: " };
     switch (tr_event.key.keysym.sym) {
     case SDLK_w:
@@ -95,7 +96,7 @@ void Camera::handle_inputs(SDL_Event &tr_event)
 
     case SDLK_LSHIFT:
       message += "LSHIFT";
-      speed = 0.1f;
+      speed = 0.1F;
       break;
     }
 

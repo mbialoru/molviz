@@ -19,4 +19,4 @@ target_link_system_libraries(
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "${CMAKE_BINARY_DIR}/config/include")
 
-add_dependencies(${CMAKE_PROJECT_NAME} ${CMAKE_PROJECT_NAME}_shaders)
+add_dependencies(${CMAKE_PROJECT_NAME} ${CMAKE_PROJECT_NAME}_resources)

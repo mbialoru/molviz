@@ -24,7 +24,7 @@ public:
 
   void update_matrix(const float t_fov_degrees, const float t_near_plane, const float t_far_plane);
   void export_matrix(Molviz::gfx::Shader &t_shader, const char *tp_uniform);
-  void handle_inputs(SDL_Event &tr_input);
+  void handle_inputs(const SDL_Event &tr_event);
 
   glm::vec3 position;
   glm::vec3 orientation;

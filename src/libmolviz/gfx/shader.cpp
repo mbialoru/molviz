@@ -15,7 +15,7 @@ std::string Molviz::gfx::shader_type_to_string(const ShaderType t_type)
     return { "VERTEX" };
     break;
   default:
-    spdlog::error("invalid shader type {} given", t_type);
+    spdlog::error("invalid shader type {} given", static_cast<int>(t_type));
     throw std::invalid_argument("invalid shader type");
     break;
   }
@@ -60,8 +60,9 @@ Shader::Shader(const std::filesystem::path &tr_vertex_shader, const std::filesys
   glDeleteShader(vertex_shader);
   glDeleteShader(fragment_shader);
 
-  spdlog::info(
-    "initialized shader program {} {}", tr_vertex_shader.filename().string(), tr_fragment_shader.filename().string());
+  spdlog::info("initialized shader program");
+  spdlog::debug("vertex shader file {}", tr_vertex_shader.filename().string());
+  spdlog::debug("fragment shader file {}", tr_fragment_shader.filename().string());
 }
 
 Shader::~Shader() { cleanup(); }
