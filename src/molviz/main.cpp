@@ -19,7 +19,7 @@ using Molviz::gfx::Mesh;
 using Molviz::gfx::Model;
 using Molviz::gfx::Camera;
 
-// Main code
+// main code
 int main(int argc, char **argv)
 {
   // set loglevel
@@ -30,7 +30,7 @@ int main(int argc, char **argv)
     spdlog::error("SDL initialization error: {}", SDL_GetError());
     return -1;
   }
-  // Decide GL+GLSL versions
+  // decide GL+GLSL versions
 #if defined(IMGUI_IMPL_OPENGL_ES2)
   // GL ES 2.0 + GLSL 100
   const char *glsl_version = "#version 100";
@@ -53,12 +53,12 @@ int main(int argc, char **argv)
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 #endif
-  // From 2.0.18: Enable native IME.
+  // from 2.0.18: enable native IME.
 #ifdef SDL_HINT_IME_SHOW_UI
   SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
 #endif
 
-  // Create window with graphics context
+  // create window with graphics context
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
@@ -70,24 +70,25 @@ int main(int argc, char **argv)
   glewInit();
   SDL_GL_MakeCurrent(window, gl_context);
 
-  // Use Vsync
+  // try to enable vsync
   if (SDL_GL_SetSwapInterval(1) < 0) { spdlog::warn("unable to set VSync! SDL error: {}", SDL_GetError()); }
 
-  // Setup Dear ImGui context
+  // create Dear ImGui context
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO &io = ImGui::GetIO();
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;// Enable Keyboard Controls
 
-  // Setup Dear ImGui style
+  // set Dear ImGui color style
   ImGui::StyleColorsDark();
 
   // Setup Platform/Renderer backends
   ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
   ImGui_ImplOpenGL3_Init(glsl_version);
 
-  // Our state
-  ImVec4 clear_color = ImVec4(1.00F, 1.00F, 1.00F, 1.00F);
+  // our application state
+  // TODO: separate struct for storing context information
+  ImVec4 clear_color = ImVec4(0.5F, 0.0F, 1.0F, 1.0F);
 
   spdlog::debug("imgui configured");
 
@@ -121,7 +122,7 @@ int main(int argc, char **argv)
   uint32_t last_frametime;
   uint32_t this_frametime;
 
-  // Main loop
+  // main loop
   bool done = false;
   while (!done) {
     last_frametime = this_frametime;

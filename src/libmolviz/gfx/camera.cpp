@@ -27,7 +27,7 @@ void Camera::export_matrix(Shader &t_shader, const char *tp_uniform)
 void Camera::handle_inputs(const SDL_Event &tr_event)
 {
   if (tr_event.type == SDL_KEYDOWN) {
-    std::string message{ "press: " };
+    std::string message{ "key press: " };
     switch (tr_event.key.keysym.sym) {
     case SDLK_w:
       message += "W";
@@ -68,7 +68,7 @@ void Camera::handle_inputs(const SDL_Event &tr_event)
     spdlog::debug(message);
 
   } else if (tr_event.type == SDL_KEYUP) {
-    std::string message{ "release: " };
+    std::string message{ "key release: " };
     switch (tr_event.key.keysym.sym) {
     case SDLK_w:
       message += "W";
