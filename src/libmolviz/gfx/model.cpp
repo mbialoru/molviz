@@ -28,7 +28,7 @@ std::vector<unsigned char> Model::get_data()
   std::string bytes_text;
   std::string uri = m_json["buffers"][0]["uri"];
 
-  // NOTE: refactor to use std::filesystem
+  // TODO: refactor to use std::filesystem
   std::string file_string{ std::string(mp_file) };
   std::string file_directory{ file_string.substr(0, file_string.find_last_of('/') + 1) };
 
@@ -49,11 +49,11 @@ std::vector<float> Model::get_floats(nlohmann::json t_accessor)
 
   std::string type{ t_accessor["type"] };
 
-  nlohmann::json buffer_view{ m_json["bufferViews"][buffer_view_index] };
+  nlohmann::json buffer_view = m_json["bufferViews"][buffer_view_index];
   unsigned int byte_offset{ buffer_view["byteOffset"] };
   unsigned int number_per_vertex;
 
-  // NOTE: refactor to use sizeof
+  // TODO: refactor to use sizeof
   if (type == "SCALAR")
     number_per_vertex = 1;
   else if (type == "VEC2")
@@ -76,6 +76,8 @@ std::vector<float> Model::get_floats(nlohmann::json t_accessor)
     std::memcpy(&value, bytes, sizeof(float));
     float_vector.push_back(value);
   }
+
+  return float_vector;
 }
 
 std::vector<GLuint> Model::get_indices(nlohmann::json t_accessor)
@@ -87,7 +89,7 @@ std::vector<GLuint> Model::get_indices(nlohmann::json t_accessor)
   unsigned int access_byte_offset = t_accessor.value("byteOffset", 0);
   unsigned int component_type = t_accessor["componentType"];
 
-  nlohmann::json buffer_view{ m_json["bufferViews"][buffer_vier_index] };
+  nlohmann::json buffer_view = m_json["bufferViews"][buffer_vier_index];
   unsigned int byte_offset{ buffer_view["byteOffset"] };
 
   unsigned int data_begin = byte_offset + access_byte_offset;
@@ -114,16 +116,23 @@ std::vector<GLuint> Model::get_indices(nlohmann::json t_accessor)
       indices.push_back(static_cast<GLuint>(value));
     }
   }
+
+  spdlog::debug("acquired {} indices", indices.size());
+
   return indices;
 }
 
 std::vector<Vertex> Model::assemble_vertices(std::vector<glm::vec3> t_positions, std::vector<glm::vec3> t_normals)
 {
-  // TODO: color here is fullbright white
+  // TODO: color here is fullbright white, would be nice to affect it
   std::vector<Vertex> vertices;
   for (std::size_t i{ 0 }; i < t_positions.size(); ++i) {
     vertices.push_back(Vertex(t_positions[i], t_normals[i], glm::vec3(1.0F, 1.0F, 1.0F)));
   }
+
+  spdlog::debug("acquired {} vertices", vertices.size());
+
+  return vertices;
 }
 
 std::vector<glm::vec2> Model::group_floats_vec2(std::vector<float> t_floats)
@@ -153,9 +162,12 @@ std::vector<glm::vec4> Model::group_floats_vec4(std::vector<float> t_floats)
 
 void Model::load_mesh(unsigned int t_mesh_index)
 {
-  unsigned int position_access_index{ m_json["meshes"][t_mesh_index]["primitives"][0]["attributes"]["POSITION"] };
-  unsigned int normal_access_index{ m_json["meshes"][t_mesh_index]["primitives"][0]["attributes"]["NORMAL"] };
-  unsigned int index_access_index{ m_json["meshes"][t_mesh_index]["primitives"][0]["indices"] };
+  //!! WARNING: do not use curly brace initialization, types mismatch
+  unsigned int position_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["attributes"]["POSITION"];
+  unsigned int normal_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["attributes"]["NORMAL"];
+  unsigned int index_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["indices"];
+
+  spdlog::debug("loaded mesh index={}", t_mesh_index);
 
   std::vector<float> position_vector{ get_floats(m_json["accessors"][position_access_index]) };
   std::vector<glm::vec3> positions{ group_floats_vec3(position_vector) };
@@ -170,31 +182,43 @@ void Model::load_mesh(unsigned int t_mesh_index)
 
 void Model::traverse_node(unsigned int t_next_node, glm::mat4 t_matrix)
 {
-  nlohmann::json node{ m_json["nodes"][t_next_node] };
-  glm::vec3 translation{ glm::vec3(0.0F, 0.0F, 0.0F) };
+  // current node
+  //!! WARNING: do not use curly brace initialization, types mismatch
+  nlohmann::json node = m_json["nodes"][t_next_node];
 
+  spdlog::debug("processing node index={}", t_next_node);
+
+  // translation if exists
+  glm::vec3 translation{ glm::vec3(0.0F, 0.0F, 0.0F) };
   if (node.find("translation") != node.end()) {
-    // TODO: this loop is pointless and can overflow
+    spdlog::debug("node has translation");
     float translation_values[3];
+    // TODO: this loop should be replaced with assignment because it can overflow
     for (std::size_t i{ 0 }; i < node["translation"].size(); ++i) { translation_values[i] = (node["translation"][i]); }
     translation = glm::make_vec3(translation_values);
   }
 
+  // rotation if exists
   glm::quat rotation{ glm::quat(1.0F, 0.0F, 0.0F, 0.0F) };
   if (node.find("rotation") != node.end()) {
+    spdlog::debug("node has rotation");
     float rotation_values[] = { node["rotation"][3], node["rotation"][0], node["rotation"][1], node["rotation"][2] };
     rotation = glm::make_quat(rotation_values);
   }
 
+  // scale if exists
   glm::vec3 scale{ glm::vec3(1.0F, 1.0F, 1.0F) };
   if (node.find("scale") != node.end()) {
+    spdlog::debug("node has scaling");
     float scale_values[3];
     for (std::size_t i{ 0 }; i < node["scale"].size(); ++i) { scale_values[i] = (node["scale"[i]]); }
     scale = glm::make_vec3(scale_values);
   }
 
+  // matrix if exists
   glm::mat4 matrix_node{ glm::mat4(1.0F) };
   if (node.find("matrix") != node.end()) {
+    spdlog::debug("node has matrix");
     float matrix_values[16];
     for (std::size_t i{ 0 }; i < node["matrix"].size(); ++i) { matrix_values[i] = (node["matrix"][i]); }
     matrix_node = glm::make_mat4(matrix_values);
@@ -210,7 +234,10 @@ void Model::traverse_node(unsigned int t_next_node, glm::mat4 t_matrix)
 
   glm::mat4 matrix_next_node{ t_matrix * matrix_node * trans * rot * sca };
 
+  // if node constains mesh - load it
   if (node.find("mesh") != node.end()) {
+    spdlog::debug("node has mesh");
+
     m_translation_meshes.push_back(translation);
     m_rotation_meshes.push_back(rotation);
     m_scale_meshes.push_back(scale);
@@ -219,6 +246,7 @@ void Model::traverse_node(unsigned int t_next_node, glm::mat4 t_matrix)
     load_mesh(node["mesh"]);
   }
 
+  // if node has children - iterate over them
   if (node.find("children") != node.end()) {
     for (std::size_t i{ 0 }; i < node["children"].size(); ++i) { traverse_node(node["children"][i], matrix_next_node); }
   }
