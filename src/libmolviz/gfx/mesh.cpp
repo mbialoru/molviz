@@ -10,7 +10,7 @@ Mesh::Mesh(std::vector<Vertex> &tr_vertices, std::vector<GLuint> &tr_indices)
   VertexBuffer vertex_buffer(vertices);
   ElementBuffer element_buffer(indices);
 
-  vertex_array.link_attribute(vertex_buffer, 0, 3, GL_FLOAT, sizeof(Vertex), static_cast<void *>(0));
+  vertex_array.link_attribute(vertex_buffer, 0, 3, GL_FLOAT, sizeof(Vertex), reinterpret_cast<void *>(0));
   vertex_array.link_attribute(
     vertex_buffer, 1, 3, GL_FLOAT, sizeof(Vertex), reinterpret_cast<void *>(3 * sizeof(float)));
   vertex_array.link_attribute(
