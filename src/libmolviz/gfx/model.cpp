@@ -7,18 +7,44 @@ using namespace Molviz::gfx;
 
 Model::Model(const char *tp_file)
 {
-  std::string file_data{ file_contents_to_string(tp_file) };
+  // std::string file_data{ file_contents_to_string(tp_file) };
 
-  m_json = nlohmann::json::parse(file_data);
-  mp_file = tp_file;
-  m_data = get_data();
+  // m_json = nlohmann::json::parse(file_data);
+  // mp_file = tp_file;
+  // m_data = get_data();
 
-  traverse_node(0);
+  // spdlog::debug("loading model file {}", tp_file);
+
+  // traverse_node(0);
+
+  // NOTE: We're getting somewhere - this simple mesh crashes the program
+  // NOTE: default initialized vertices normals and colors do not help
+  // NOTE: problem seems not to be with how we acquire data then
+  // NOTE: but with how we handle meshes here * confused_af.jpg *
+
+  std::vector<Vertex> vertices{
+    Vertex{ glm::vec3(-0.1F, -0.1F, 0.1F), glm::vec3(-0.1F, -0.1F, 0.1F), glm::vec3(0.1F, 0.0F, 0.0F) },
+    Vertex{ glm::vec3(-0.1F, -0.1F, -0.1F), glm::vec3(-0.1F, -0.1F, -0.1F), glm::vec3(0.0F, 0.2F, 0.2F) },
+    Vertex{ glm::vec3(0.1F, -0.1F, -0.1F), glm::vec3(0.1F, -0.1F, -0.1F), glm::vec3(0.0F, 0.0F, 0.3F) },
+    Vertex{ glm::vec3(0.1F, -0.1F, 0.1F), glm::vec3(0.1F, -0.1F, 0.1F), glm::vec3(0.4F, 0.0F, 0.0F) },
+    Vertex{ glm::vec3(-0.1F, 0.1F, 0.1F), glm::vec3(-0.1F, 0.1F, 0.1F), glm::vec3(0.0F, 0.0F, 0.5F) },
+    Vertex{ glm::vec3(-0.1F, 0.1F, -0.1F), glm::vec3(-0.1F, 0.1F, -0.1F), glm::vec3(0.6F, 0.0F, 0.0F) },
+    Vertex{ glm::vec3(0.1F, 0.1F, -0.1F), glm::vec3(0.1F, 0.1F, -0.1F), glm::vec3(0.0F, 0.7F, 0.0F) },
+    Vertex{ glm::vec3(0.1F, 0.1F, 0.1F), glm::vec3(0.1F, 0.1F, 0.1F), glm::vec3(0.0F, 0.0F, 0.8F) }
+  };
+
+  std::vector<GLuint> indices{
+    0, 1, 2, 0, 2, 3, 0, 4, 7, 0, 7, 3, 3, 7, 6, 3, 6, 2, 2, 6, 5, 2, 5, 1, 1, 5, 4, 1, 4, 0, 4, 5, 6, 4, 6, 7
+  };
+
+  m_meshes.push_back(Mesh(vertices, indices));
 }
 
 void Model::draw(Shader &tr_shader, Camera &tr_camera)
 {
-  for (std::size_t i{ 0 }; i < m_meshes.size(); ++i) { m_meshes[i].draw(tr_shader, tr_camera, m_matrices_meshes[i]); }
+  for (std::size_t i{ 0 }; i < m_meshes.size(); ++i) {
+    m_meshes[i].draw(tr_shader, tr_camera /* , m_matrices_meshes[i] */);
+  }
 }
 
 std::vector<unsigned char> Model::get_data()
@@ -114,7 +140,7 @@ std::vector<GLuint> Model::get_indices(nlohmann::json t_accessor)
     }
   }
 
-  spdlog::debug("acquired {} indices", indices.size());
+  spdlog::debug("loaded {} indices", indices.size());
 
   return indices;
 }
@@ -128,7 +154,7 @@ std::vector<Vertex> Model::assemble_vertices(std::vector<glm::vec3> t_positions,
     vertices.push_back(Vertex(t_positions[i], t_normals[i], glm::vec3(1.0F, 1.0F, 1.0F)));
   }
 
-  spdlog::debug("acquired {} vertices", vertices.size());
+  spdlog::debug("loaded {} vertices", vertices.size());
 
   return vertices;
 }
@@ -163,7 +189,7 @@ std::vector<glm::vec4> Model::group_floats_vec4(std::vector<float> t_floats)
 
 void Model::load_mesh(unsigned int t_mesh_index)
 {
-  //!! WARNING: do not use curly brace initialization, types mismatch
+  //!! WARNING: do not use curly brace initialization with json, internal types mismatch
   unsigned int position_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["attributes"]["POSITION"];
   unsigned int normal_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["attributes"]["NORMAL"];
   unsigned int index_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["indices"];
@@ -179,7 +205,7 @@ void Model::load_mesh(unsigned int t_mesh_index)
 
   m_meshes.push_back(Mesh(vertices, indices));
 
-  spdlog::debug("loaded mesh index={}", t_mesh_index);
+  spdlog::debug("loaded mesh {}", t_mesh_index);
 }
 
 void Model::traverse_node(unsigned int t_next_node, glm::mat4 t_matrix)
@@ -188,7 +214,7 @@ void Model::traverse_node(unsigned int t_next_node, glm::mat4 t_matrix)
   //!! WARNING: do not use curly brace initialization, types mismatch
   nlohmann::json node = m_json["nodes"][t_next_node];
 
-  spdlog::debug("processing node index={}", t_next_node);
+  spdlog::debug("processing node {}", t_next_node);
 
   // translation if exists
   glm::vec3 translation = glm::vec3(0.0F, 0.0F, 0.0F);

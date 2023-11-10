@@ -92,10 +92,10 @@ int main(int argc, char **argv)
 
   spdlog::debug("imgui configured");
 
-  std::filesystem::path model_fragment_shader{ "../resources/shaders/default.frag" };
-  std::filesystem::path model_vertex_shader{ "../resources/shaders/default.vert" };
+  std::filesystem::path fragment_shader{ "../resources/shaders/default.frag" };
+  std::filesystem::path vertex_shader{ "../resources/shaders/default.vert" };
 
-  Shader shader_program{ model_vertex_shader, model_fragment_shader };
+  Shader shader_program{ vertex_shader, fragment_shader };
   shader_program.activate();
 
   glm::vec4 light_color{ 0.5F, 0.5F, 0.5F, 0.5F };
@@ -110,10 +110,6 @@ int main(int argc, char **argv)
 
   // clipping of overlapping vertices, depth buffer or "z buffer"
   glEnable(GL_DEPTH_TEST);
-
-  // OpenGL debug output
-  glEnable(GL_DEBUG_OUTPUT);
-  glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);// wireframe
 
