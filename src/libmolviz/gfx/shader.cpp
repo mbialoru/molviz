@@ -43,26 +43,25 @@ Shader::Shader(const std::filesystem::path &tr_vertex_shader, const std::filesys
   glShaderSource(vertex_shader, 1, &p_vertex_source, nullptr);
   glCompileShader(vertex_shader);
   compile_errors(vertex_shader, ShaderType::VERTEX);
+  spdlog::debug("compiled vertex shader file {}", tr_vertex_shader.filename().string());
 
   // process fragent shader
   const GLuint fragment_shader{ glCreateShader(GL_FRAGMENT_SHADER) };
   glShaderSource(fragment_shader, 1, &p_fragment_source, nullptr);
   glCompileShader(fragment_shader);
   compile_errors(fragment_shader, ShaderType::FRAGMENT);
+  spdlog::debug("compiled fragment shader file {}", tr_fragment_shader.filename().string());
 
   // process shader program
   glAttachShader(id, vertex_shader);
   glAttachShader(id, fragment_shader);
   glLinkProgram(id);
   compile_errors(id, ShaderType::PROGRAM);
+  spdlog::debug("linked shader program");
 
   // cleanup
   glDeleteShader(vertex_shader);
   glDeleteShader(fragment_shader);
-
-  spdlog::info("initialized shader program");
-  spdlog::debug("vertex shader file {}", tr_vertex_shader.filename().string());
-  spdlog::debug("fragment shader file {}", tr_fragment_shader.filename().string());
 }
 
 Shader::~Shader() { cleanup(); }

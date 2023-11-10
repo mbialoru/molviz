@@ -19,9 +19,8 @@ uniform mat4 u_model_matrix;
 
 void main()
 {
-	c_current_position = vec3(u_model_matrix * u_translation * -u_rotation *
-		u_scale * vec4(i_position, 1.0f));
-	c_normal = i_normal;
-	c_color = i_color;
-	gl_Position = u_camera_matrix * vec4(c_current_position, 1.0);
+  c_current_position = vec3(u_model_matrix * u_translation * -u_rotation * u_scale * vec4(i_position, 1.0f));
+  c_normal = i_normal;
+  c_color = i_color;
+  gl_Position = u_camera_matrix * vec4(c_current_position, 1.0);
 }
