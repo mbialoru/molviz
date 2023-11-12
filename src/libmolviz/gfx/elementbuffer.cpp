@@ -9,8 +9,6 @@ ElementBuffer::ElementBuffer(std::vector<GLuint> &tr_indices)
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, tr_indices.size() * sizeof(GLuint), tr_indices.data(), GL_STATIC_DRAW);
 };
 
-ElementBuffer::~ElementBuffer() { cleanup(); }
-
 void ElementBuffer::bind() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id); }
 
 void ElementBuffer::unbind() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); }
