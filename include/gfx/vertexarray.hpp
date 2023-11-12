@@ -13,7 +13,7 @@ class VertexArray
 {
 public:
   VertexArray();
-  ~VertexArray();
+  ~VertexArray() = default;
 
   void bind();
   void unbind();
@@ -26,8 +26,6 @@ public:
     void *tp_offset);
 
   GLuint id;
-
-private:
 };
 
 }// namespace Molviz::gfx
