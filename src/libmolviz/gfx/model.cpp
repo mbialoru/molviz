@@ -7,56 +7,30 @@ using namespace Molviz::gfx;
 
 Model::Model(const char *tp_file)
 {
-  // std::string file_data{ file_contents_to_string(tp_file) };
+  std::string file_data{ file_contents_to_string(tp_file) };
 
-  // m_json = nlohmann::json::parse(file_data);
-  // mp_file = tp_file;
-  // m_data = get_data();
+  m_json = nlohmann::json::parse(file_data);
+  mp_file = tp_file;
+  m_data = get_data();
 
-  // spdlog::debug("loading model file {}", tp_file);
+  spdlog::debug("loading model file {}", tp_file);
 
-  // traverse_node(0);
-
-  // NOTE: We're getting somewhere - this simple mesh crashes the program
-  // NOTE: default initialized vertices normals and colors do not help
-  // NOTE: problem seems not to be with how we acquire data then
-  // NOTE: but with how we handle meshes here * confused_af.jpg *
-
-  std::vector<Vertex> vertices{
-    Vertex{ glm::vec3(-0.1F, -0.1F, 0.1F), glm::vec3(-0.1F, -0.1F, 0.1F), glm::vec3(0.1F, 0.0F, 0.0F) },
-    Vertex{ glm::vec3(-0.1F, -0.1F, -0.1F), glm::vec3(-0.1F, -0.1F, -0.1F), glm::vec3(0.0F, 0.2F, 0.2F) },
-    Vertex{ glm::vec3(0.1F, -0.1F, -0.1F), glm::vec3(0.1F, -0.1F, -0.1F), glm::vec3(0.0F, 0.0F, 0.3F) },
-    Vertex{ glm::vec3(0.1F, -0.1F, 0.1F), glm::vec3(0.1F, -0.1F, 0.1F), glm::vec3(0.4F, 0.0F, 0.0F) },
-    Vertex{ glm::vec3(-0.1F, 0.1F, 0.1F), glm::vec3(-0.1F, 0.1F, 0.1F), glm::vec3(0.0F, 0.0F, 0.5F) },
-    Vertex{ glm::vec3(-0.1F, 0.1F, -0.1F), glm::vec3(-0.1F, 0.1F, -0.1F), glm::vec3(0.6F, 0.0F, 0.0F) },
-    Vertex{ glm::vec3(0.1F, 0.1F, -0.1F), glm::vec3(0.1F, 0.1F, -0.1F), glm::vec3(0.0F, 0.7F, 0.0F) },
-    Vertex{ glm::vec3(0.1F, 0.1F, 0.1F), glm::vec3(0.1F, 0.1F, 0.1F), glm::vec3(0.0F, 0.0F, 0.8F) }
-  };
-
-  std::vector<GLuint> indices{
-    0, 1, 2, 0, 2, 3, 0, 4, 7, 0, 7, 3, 3, 7, 6, 3, 6, 2, 2, 6, 5, 2, 5, 1, 1, 5, 4, 1, 4, 0, 4, 5, 6, 4, 6, 7
-  };
-
-  m_meshes.push_back(Mesh(vertices, indices));
+  traverse_node(0);
 }
 
 void Model::draw(Shader &tr_shader, Camera &tr_camera)
 {
-  for (std::size_t i{ 0 }; i < m_meshes.size(); ++i) {
-    m_meshes[i].draw(tr_shader, tr_camera /* , m_matrices_meshes[i] */);
-  }
+  for (std::size_t i{ 0 }; i < m_meshes.size(); ++i) { m_meshes[i].draw(tr_shader, tr_camera, m_matrices_meshes[i]); }
 }
 
 std::vector<unsigned char> Model::get_data()
 {
-  std::string bytes_text;
   std::string uri = m_json["buffers"][0]["uri"];
 
   // TODO: refactor to use std::filesystem
   std::string file_string{ std::string(mp_file) };
   std::string file_directory{ file_string.substr(0, file_string.find_last_of('/') + 1) };
-
-  bytes_text = file_contents_to_string((file_directory + uri).c_str());
+  std::string bytes_text{ file_contents_to_string((file_directory + uri).c_str()) };
 
   std::vector<unsigned char> data{ bytes_text.begin(), bytes_text.end() };
 
