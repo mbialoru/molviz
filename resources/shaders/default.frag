@@ -91,7 +91,4 @@ vec4 spot_light()
 	return (vec4(c_color, 1.0f) * (diffuse * intensity + ambient_light) + vec4(c_color, 1.0f).x * specular * intensity) * u_light_color;
 }
 
-void main()
-{
-	fragment_color = spot_light();
-}
+void main() { fragment_color = direct_light(); }
