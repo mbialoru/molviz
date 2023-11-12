@@ -24,7 +24,7 @@ public:
 
   void update_matrix(const float t_fov_degrees, const float t_near_plane, const float t_far_plane);
   void export_matrix(Molviz::gfx::Shader &t_shader, const char *tp_uniform);
-  void handle_inputs(const SDL_Event &tr_event);
+  void handle_inputs(const SDL_Event &tr_event, SDL_Window *tp_window);
 
   glm::vec3 position;
   glm::vec3 orientation;
@@ -38,6 +38,12 @@ public:
 
   float speed;
   float sensitivity;
+
+private:
+  void handle_inputs_keyboard(const SDL_Event &tr_event);
+  void handle_inputs_mouse(const SDL_Event &tr_event, SDL_Window *tp_window);
+  void mouse_rotate(SDL_Window *tp_window);
+  void mouse_reset();
 };
 
 }// namespace Molviz::gfx

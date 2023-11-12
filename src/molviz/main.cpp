@@ -77,7 +77,9 @@ int main(int argc, char **argv)
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO &io = ImGui::GetIO();
-  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;// Enable Keyboard Controls
+
+  // enable keyboard controls for ImGui
+  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
   // set Dear ImGui color style
   ImGui::StyleColorsDark();
@@ -85,6 +87,11 @@ int main(int argc, char **argv)
   // Setup Platform/Renderer backends
   ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
   ImGui_ImplOpenGL3_Init(glsl_version);
+
+  // window size
+  int window_width;
+  int window_height;
+  SDL_GetWindowSize(window, &window_width, &window_height);
 
   // our application state
   // TODO: separate structs for storing context information
@@ -117,11 +124,11 @@ int main(int argc, char **argv)
   Camera camera(static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y), glm::vec3(0.0F, 0.0F, 0.0F));
 
   // create models
-  std::filesystem::path model_gltf_file{ "../resources/meshes/cube/Cube.gltf" };
+  std::filesystem::path model_gltf_file{ "../resources/meshes/sphere/sphere.gltf" };
   Model model(std::filesystem::absolute(model_gltf_file).c_str());
 
-  uint32_t last_frametime;
-  uint32_t this_frametime;
+  uint32_t last_frametime{ 0 };
+  uint32_t this_frametime{ 0 };
 
   // main loop
   bool done = false;
@@ -146,7 +153,7 @@ int main(int argc, char **argv)
           && event.window.windowID == SDL_GetWindowID(window)) {
         done = true;
       }
-      camera.handle_inputs(event);
+      camera.handle_inputs(event, window);
     }
 
     // start the Dear ImGui frame
@@ -156,7 +163,7 @@ int main(int argc, char **argv)
 
     // handle viewport content rendering
     ImGui::Render();
-    glViewport(0, 0, static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y));
+    glViewport(0, 0, static_cast<GLsizei>(io.DisplaySize.x), static_cast<GLsizei>(io.DisplaySize.y));
     glClearColor(
       clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
