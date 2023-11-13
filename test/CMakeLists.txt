@@ -37,8 +37,17 @@ target_link_libraries(
   tests
   PRIVATE ${CMAKE_PROJECT_NAME}::project_warnings
           ${CMAKE_PROJECT_NAME}::project_options
-          ${CMAKE_PROJECT_NAME}::lib${CMAKE_PROJECT_NAME}
-          Catch2::Catch2WithMain)
+          ${CMAKE_PROJECT_NAME}::lib${CMAKE_PROJECT_NAME})
+
+target_link_system_libraries(
+  tests
+  PRIVATE Catch2::Catch2WithMain
+          GLEW::GLEW
+          glm::glm
+          nlohmann_json::nlohmann_json
+          SDL2
+          spdlog::spdlog
+          OpenGL::OpenGL)
 
 if(WIN32 AND BUILD_SHARED_LIBS)
   add_custom_command(
