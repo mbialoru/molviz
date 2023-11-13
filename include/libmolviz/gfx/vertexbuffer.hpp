@@ -19,7 +19,7 @@ struct Vertex
 class VertexBuffer
 {
 public:
-  VertexBuffer(std::vector<Vertex> &tr_vertices);
+  explicit VertexBuffer(std::vector<Vertex> &tr_vertices);
   ~VertexBuffer() = default;
 
   void bind();
@@ -28,6 +28,9 @@ public:
 
   GLuint id;
 };
+
+// convenient type alias
+using VBO = VertexBuffer;
 
 }// namespace Molviz::gfx
 

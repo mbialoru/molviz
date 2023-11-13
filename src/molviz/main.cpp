@@ -11,7 +11,7 @@
 #include <imgui_impl_sdl2.h>
 #include <spdlog/spdlog.h>
 
-#include "gfx/model.hpp"
+#include "libmolviz/gfx/model.hpp"
 
 using Molviz::gfx::Vertex;
 using Molviz::gfx::Shader;
@@ -30,6 +30,7 @@ int main(int argc, char **argv)
     spdlog::error("SDL initialization error: {}", SDL_GetError());
     return -1;
   }
+
   // decide GL+GLSL versions
 #if defined(IMGUI_IMPL_OPENGL_ES2)
   // GL ES 2.0 + GLSL 100
@@ -63,15 +64,23 @@ int main(int argc, char **argv)
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
-  SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+  SDL_WindowFlags window_flags =
+    static_cast<SDL_WindowFlags>(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
   SDL_Window *window =
     SDL_CreateWindow("Molviz", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 800, window_flags);
   SDL_GLContext gl_context = SDL_GL_CreateContext(window);
-  glewInit();
   SDL_GL_MakeCurrent(window, gl_context);
 
   // try to enable vsync
   if (SDL_GL_SetSwapInterval(1) < 0) { spdlog::warn("unable to set VSync! SDL error: {}", SDL_GetError()); }
+
+  // initialize GLEW
+  GLenum status{ glewInit() };
+  if (status != GLEW_OK) {
+    std::string error_message{ reinterpret_cast<const char *>(glewGetErrorString(status)) };
+    spdlog::error("GLEW init failed! error:{}", error_message);
+    return -1;
+  }
 
   // create Dear ImGui context
   IMGUI_CHECKVERSION();
@@ -81,10 +90,10 @@ int main(int argc, char **argv)
   // enable keyboard controls for ImGui
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-  // set Dear ImGui color style
+  // set color style
   ImGui::StyleColorsDark();
 
-  // Setup Platform/Renderer backends
+  // setup platform/renderer backends
   ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
   ImGui_ImplOpenGL3_Init(glsl_version);
 
@@ -92,6 +101,7 @@ int main(int argc, char **argv)
   int window_width;
   int window_height;
   SDL_GetWindowSize(window, &window_width, &window_height);
+  spdlog::debug("SDL window size {}x{}", window_width, window_height);
 
   // our application state
   // TODO: separate structs for storing context information
@@ -138,13 +148,6 @@ int main(int argc, char **argv)
     this_frametime = SDL_GetTicks();
 
     // Poll and handle events (inputs, window resize, etc.)
-    // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your
-    // inputs.
-    // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite
-    // your copy of the mouse data.
-    // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or
-    // clear/overwrite your copy of the keyboard data. Generally you may always pass all inputs to dear imgui, and hide
-    // them from your application based on those two flags.
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
       ImGui_ImplSDL2_ProcessEvent(&event);

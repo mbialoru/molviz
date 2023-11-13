@@ -12,7 +12,7 @@ namespace Molviz::gfx {
 class VertexArray
 {
 public:
-  VertexArray();
+  explicit VertexArray();
   ~VertexArray() = default;
 
   void bind();
@@ -27,6 +27,9 @@ public:
 
   GLuint id;
 };
+
+// convenient type alias
+using VAO = VertexArray;
 
 }// namespace Molviz::gfx
 

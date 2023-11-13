@@ -1,4 +1,4 @@
-#include "gfx/vertexbuffer.hpp"
+#include "libmolviz/gfx/vertexbuffer.hpp"
 
 using namespace Molviz::gfx;
 

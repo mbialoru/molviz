@@ -1,4 +1,4 @@
-#include "gfx/elementbuffer.hpp"
+#include "libmolviz/gfx/elementbuffer.hpp"
 
 using namespace Molviz::gfx;
 

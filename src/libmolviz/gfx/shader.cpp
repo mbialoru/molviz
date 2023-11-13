@@ -1,4 +1,4 @@
-#include "gfx/shader.hpp"
+#include "libmolviz/gfx/shader.hpp"
 
 using namespace Molviz::gfx;
 
