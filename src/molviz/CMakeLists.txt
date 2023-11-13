@@ -6,16 +6,15 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_PROJECT_NAME}::proje
 
 target_link_system_libraries(
   ${CMAKE_PROJECT_NAME}
-  PRIVATE
-  CLI11::CLI11
-  fmt::fmt
-  GLEW::GLEW
-  glm::glm
-  imgui
-  nlohmann_json::nlohmann_json
-  OpenGL::OpenGL
-  SDL2
-  spdlog::spdlog)
+  PRIVATE CLI11::CLI11
+          fmt::fmt
+          GLEW::GLEW
+          glm::glm
+          imgui
+          nlohmann_json::nlohmann_json
+          OpenGL::OpenGL
+          SDL2
+          spdlog::spdlog)
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "${CMAKE_BINARY_DIR}/config/include")
 

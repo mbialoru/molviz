@@ -11,7 +11,7 @@ namespace Molviz::gfx {
 class ElementBuffer
 {
 public:
-  ElementBuffer(std::vector<GLuint> &tr_indices);
+  explicit ElementBuffer(std::vector<GLuint> &tr_indices);
   ~ElementBuffer() = default;
 
   void bind();
@@ -20,6 +20,9 @@ public:
 
   GLuint id;
 };
+
+// convenient type alias
+using EBO = ElementBuffer;
 
 }// namespace Molviz::gfx
 

@@ -1,4 +1,4 @@
-#include "gfx/vertexarray.hpp"
+#include "libmolviz/gfx/vertexarray.hpp"
 
 using namespace Molviz::gfx;
 

@@ -1,4 +1,4 @@
-#include "gfx/camera.hpp"
+#include "libmolviz/gfx/camera.hpp"
 
 using namespace Molviz::gfx;
 
