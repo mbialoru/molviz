@@ -2,51 +2,125 @@
 #include <SDL.h>
 #include <catch2/catch_test_macros.hpp>
 #include <spdlog/spdlog.h>
+#include <utility>
 
 #include "libmolviz/gfx/elementbuffer.hpp"
+#include "libmolviz/gfx/mesh.hpp"
+#include "libmolviz/gfx/shader.hpp"
 #include "libmolviz/gfx/vertexarray.hpp"
+#include "libmolviz/gfx/vertexbuffer.hpp"
 
-TEST_CASE("ElementBuffer valid creation and cleanup", "[ElementBuffer, EBO]") {}
+// utilities
 
-TEST_CASE("VertexArray valid creation and cleanup", "[VertexArray, VAO]")
+std::pair<SDL_Window *, SDL_GLContext> create_dummy_opengl_context()
 {
-  using namespace Molviz::gfx;
-
-  // initialize SDL
+  // init SDL
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     spdlog::error("SDL initialization error: {}", SDL_GetError());
     FAIL();
   }
 
-  // create dummy SDL window for getting a dummy OpenGL context
+  // create dummy hidden SDL window for a dummy OpenGL context
   SDL_WindowFlags window_flags{ static_cast<SDL_WindowFlags>(SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN) };
-  SDL_Window *window{ SDL_CreateWindow(nullptr, 0, 0, 0, 0, window_flags) };
-  SDL_GLContext gl_context{ SDL_GL_CreateContext(window) };
+  SDL_Window *p_window{ SDL_CreateWindow(nullptr, 0, 0, 0, 0, window_flags) };
+  SDL_GLContext context{ SDL_GL_CreateContext(p_window) };
 
-  // init GLEW
+  // init GLEW after OpenGL context - Missing GL version error otherwise
   GLenum status{ glewInit() };
   if (status != GLEW_OK) {
     std::string error_message{ reinterpret_cast<const char *>(glewGetErrorString(status)) };
-    spdlog::error("GLEW init failed! error:{}", error_message);
+    spdlog::error("GLEW init failed! error: {}", error_message);
     FAIL();
   }
 
-  // create VAO
+  return { p_window, context };
+}
+
+void cleanup_dummy_opengl_context(SDL_Window *tp_window, SDL_GLContext t_context)
+{
+  SDL_GL_DeleteContext(t_context);
+  SDL_DestroyWindow(tp_window);
+  SDL_Quit();
+}
+
+// unit tests
+
+TEST_CASE("ElementBuffer valid creation and cleanup", "[ElementBuffer, EBO]")
+{
+  using namespace Molviz::gfx;
+
+  auto [p_window, context]{ create_dummy_opengl_context() };
+
+  std::vector<GLuint> indices;
+  ElementBuffer element_buffer{ indices };
+  element_buffer.bind();
+
+  REQUIRE(glIsBuffer(element_buffer.id));
+
+  element_buffer.unbind();
+  element_buffer.cleanup();
+
+  REQUIRE_FALSE(glIsBuffer(element_buffer.id));
+
+  cleanup_dummy_opengl_context(p_window, context);
+}
+
+TEST_CASE("VertexBuffer valud creation and cleanup", "[VertexBuffer, VBO]")
+{
+  using namespace Molviz::gfx;
+
+  auto [p_window, context]{ create_dummy_opengl_context() };
+
+  std::vector<Vertex> vertices;
+  VertexBuffer vertex_buffer{ vertices };
+
+  REQUIRE(glIsBuffer(vertex_buffer.id));
+
+  vertex_buffer.unbind();
+  vertex_buffer.cleanup();
+
+  REQUIRE_FALSE(glIsBuffer(vertex_buffer.id));
+
+  cleanup_dummy_opengl_context(p_window, context);
+}
+
+TEST_CASE("VertexArray valid creation and cleanup", "[VertexArray, VAO]")
+{
+  using namespace Molviz::gfx;
+
+  auto [p_window, context]{ create_dummy_opengl_context() };
+
   VertexArray vertex_array;
   vertex_array.bind();
 
-  // check if array was reserved
   REQUIRE(glIsVertexArray(vertex_array.id));
 
-  // destroy reserved array
   vertex_array.unbind();
   vertex_array.cleanup();
 
-  // check if array has been destroyed
-  REQUIRE(not glIsVertexArray(vertex_array.id));
+  REQUIRE_FALSE(glIsVertexArray(vertex_array.id));
 
-  // cleanup
-  SDL_GL_DeleteContext(gl_context);
-  SDL_DestroyWindow(window);
-  SDL_Quit();
+  cleanup_dummy_opengl_context(p_window, context);
 }
+
+TEST_CASE("Shader valid creation and cleanup", "[Shader]")
+{
+  using namespace Molviz::gfx;
+
+  std::filesystem::path vertex_shader{ "/workspaces/molviz/test/resources/default.frag" };
+  std::filesystem::path fragment_shader{ "/workspaces/molviz/test/resources/default.frag" };
+
+  auto [p_window, context]{ create_dummy_opengl_context() };
+
+  Shader shader{ vertex_shader, fragment_shader };
+
+  REQUIRE(glIsProgram(shader.id));
+
+  shader.cleanup();
+
+  REQUIRE_FALSE(glIsProgram(shader.id));
+
+  cleanup_dummy_opengl_context(p_window, context);
+}
+
+TEST_CASE("Mesh valid creation and cleanup", "[Mesh]") { FAIL("Not yet implemented"); }
