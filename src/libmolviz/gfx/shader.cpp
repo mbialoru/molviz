@@ -82,6 +82,7 @@ void Shader::compile_errors(GLuint t_shader, const ShaderType t_type)
       glGetShaderInfoLog(t_shader, BUFFER_SIZE, nullptr, message_buffer.data());
       std::string message{ message_buffer.begin(), message_buffer.end() };
       spdlog::error("shader compilation error for: {} {}", shader_type_to_string(t_type), message);
+      throw std::runtime_error("shader compilation error");
     }
   } else {
     glGetProgramiv(t_shader, GL_LINK_STATUS, &has_compiled);
@@ -89,6 +90,7 @@ void Shader::compile_errors(GLuint t_shader, const ShaderType t_type)
       glGetProgramInfoLog(t_shader, BUFFER_SIZE, nullptr, message_buffer.data());
       std::string message{ message_buffer.begin(), message_buffer.end() };
       spdlog::error("shader linking error for {} {}", shader_type_to_string(t_type), message);
+      throw std::runtime_error("shader linking error");
     }
   }
 }
