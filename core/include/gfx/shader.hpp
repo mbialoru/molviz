@@ -6,7 +6,7 @@
 #include <GL/glew.h>
 #include <spdlog/spdlog.h>
 
-#include "libmolviz/utilities.hpp"
+#include "utilities.hpp"
 
 namespace Molviz::gfx {
 

@@ -4,11 +4,11 @@
 #include <spdlog/spdlog.h>
 #include <utility>
 
-#include "libmolviz/gfx/elementbuffer.hpp"
-#include "libmolviz/gfx/mesh.hpp"
-#include "libmolviz/gfx/shader.hpp"
-#include "libmolviz/gfx/vertexarray.hpp"
-#include "libmolviz/gfx/vertexbuffer.hpp"
+#include "gfx/elementbuffer.hpp"
+#include "gfx/mesh.hpp"
+#include "gfx/shader.hpp"
+#include "gfx/vertexarray.hpp"
+#include "gfx/vertexbuffer.hpp"
 
 // utilities
 

@@ -60,7 +60,8 @@ add_library(${CMAKE_PROJECT_NAME}::project_warnings ALIAS project_warnings)
 add_subdirectory(config)
 
 # Adding the src:
-add_subdirectory(src)
+add_subdirectory(core)
+add_subdirectory(app)
 
 # Don't even look at tests if we're not top level
 if(NOT PROJECT_IS_TOP_LEVEL)
