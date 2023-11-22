@@ -5,21 +5,36 @@ using namespace Molviz::gfx;
 Mesh::Mesh(std::vector<Vertex> &tr_vertices, std::vector<GLuint> &tr_indices)
   : vertices(tr_vertices), indices(tr_indices)
 {
-  vertex_array.bind();
+  p_vertex_array = std::make_unique<VertexArray>(VertexArray());
+  p_vertex_array->bind();
 
-  VertexBuffer vertex_buffer(vertices);
-  ElementBuffer element_buffer(indices);
+  p_vertex_buffer = std::make_unique<VertexBuffer>(VertexBuffer(vertices));
+  p_element_buffer = std::make_unique<ElementBuffer>(ElementBuffer(indices));
 
-  vertex_array.link_attribute(vertex_buffer, 0, 3, GL_FLOAT, sizeof(Vertex), reinterpret_cast<void *>(0));
-  vertex_array.link_attribute(
-    vertex_buffer, 1, 3, GL_FLOAT, sizeof(Vertex), reinterpret_cast<void *>(3 * sizeof(float)));
-  vertex_array.link_attribute(
-    vertex_buffer, 2, 3, GL_FLOAT, sizeof(Vertex), reinterpret_cast<void *>(6 * sizeof(float)));
+  p_vertex_array->link_attribute(*p_vertex_buffer.get(), 0, 3, GL_FLOAT, sizeof(Vertex), reinterpret_cast<void *>(0));
+  p_vertex_array->link_attribute(
+    *p_vertex_buffer.get(), 1, 3, GL_FLOAT, sizeof(Vertex), reinterpret_cast<void *>(3 * sizeof(float)));
+  p_vertex_array->link_attribute(
+    *p_vertex_buffer.get(), 2, 3, GL_FLOAT, sizeof(Vertex), reinterpret_cast<void *>(6 * sizeof(float)));
 
-  vertex_array.unbind();
-  vertex_buffer.unbind();
-  element_buffer.unbind();
+  p_vertex_array->unbind();
+  p_vertex_buffer->unbind();
+  p_element_buffer->unbind();
 };
+
+Mesh::Mesh(Mesh &&tr_other)
+{
+  tr_other.p_element_buffer.swap(p_element_buffer);
+  tr_other.p_vertex_buffer.swap(p_vertex_buffer);
+  tr_other.p_vertex_array.swap(p_vertex_array);
+}
+
+Mesh::~Mesh()
+{
+  if (p_element_buffer) p_element_buffer->cleanup();
+  if (p_vertex_buffer) p_vertex_buffer->cleanup();
+  if (p_vertex_array) p_vertex_array->cleanup();
+}
 
 void Mesh::draw(Shader &tr_shader,
   Camera &tr_camera,
@@ -29,7 +44,7 @@ void Mesh::draw(Shader &tr_shader,
   glm::vec3 t_scale)
 {
   tr_shader.activate();
-  vertex_array.bind();
+  p_vertex_array->bind();
 
   // handle camera matrix
   glUniform3f(glGetUniformLocation(tr_shader.id, "u_camera_position"),
