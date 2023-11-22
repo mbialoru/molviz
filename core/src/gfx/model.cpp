@@ -1,4 +1,4 @@
-#include "libmolviz/gfx/model.hpp"
+#include "gfx/model.hpp"
 
 using namespace Molviz::gfx;
 

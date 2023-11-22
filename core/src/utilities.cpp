@@ -1,4 +1,4 @@
-#include "libmolviz/utilities.hpp"
+#include "utilities.hpp"
 
 using namespace Molviz;
 

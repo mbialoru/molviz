@@ -37,7 +37,7 @@ target_link_libraries(
   tests
   PRIVATE ${CMAKE_PROJECT_NAME}::project_warnings
           ${CMAKE_PROJECT_NAME}::project_options
-          ${CMAKE_PROJECT_NAME}::lib${CMAKE_PROJECT_NAME})
+          ${CMAKE_PROJECT_NAME}::Core)
 
 target_link_system_libraries(
   tests
@@ -79,7 +79,7 @@ target_link_libraries(
   constexpr_tests
   PRIVATE ${CMAKE_PROJECT_NAME}::project_warnings
           ${CMAKE_PROJECT_NAME}::project_options
-          ${CMAKE_PROJECT_NAME}::lib${CMAKE_PROJECT_NAME}
+          ${CMAKE_PROJECT_NAME}::Core
           Catch2::Catch2WithMain)
 
 catch_discover_tests(
@@ -103,7 +103,7 @@ target_link_libraries(
   relaxed_constexpr_tests
   PRIVATE ${CMAKE_PROJECT_NAME}::project_warnings
           ${CMAKE_PROJECT_NAME}::project_options
-          ${CMAKE_PROJECT_NAME}::lib${CMAKE_PROJECT_NAME}
+          ${CMAKE_PROJECT_NAME}::Core
           Catch2::Catch2WithMain)
 target_compile_definitions(relaxed_constexpr_tests PRIVATE -DCATCH_CONFIG_RUNTIME_STATIC_REQUIRE)
 
@@ -120,8 +120,8 @@ catch_discover_tests(
   OUTPUT_SUFFIX
   .xml)
 
-if(NOT TARGET ${CMAKE_PROJECT_NAME}_tests)
-  add_custom_target(${CMAKE_PROJECT_NAME}_tests)
+if(NOT TARGET tests)
+  add_custom_target(tests)
   add_dependencies(
     ${CMAKE_PROJECT_NAME}_tests
     tests

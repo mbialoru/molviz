@@ -1,4 +1,4 @@
-#include "libmolviz/gfx/mesh.hpp"
+#include "gfx/mesh.hpp"
 
 using namespace Molviz::gfx;
 
