@@ -16,7 +16,8 @@ class Mesh
 {
 public:
   Mesh(std::vector<Vertex> &tr_vertices, std::vector<GLuint> &tr_indices);
-  ~Mesh() = default;
+  Mesh(Mesh &&tr_other);
+  ~Mesh();
 
   void draw(Shader &tr_shader,
     Camera &tr_camera,
@@ -28,7 +29,9 @@ public:
   std::vector<Vertex> vertices;
   std::vector<GLuint> indices;
 
-  VertexArray vertex_array;
+  std::unique_ptr<VertexArray> p_vertex_array;
+  std::unique_ptr<VertexBuffer> p_vertex_buffer;
+  std::unique_ptr<ElementBuffer> p_element_buffer;
 };
 
 }// namespace Molviz::gfx
