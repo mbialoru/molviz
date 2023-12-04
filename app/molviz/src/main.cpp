@@ -11,7 +11,7 @@
 #include <imgui_impl_sdl2.h>
 #include <spdlog/spdlog.h>
 
-#include "libmolviz/gfx/model.hpp"
+#include "gfx/model.hpp"
 
 using Molviz::gfx::Vertex;
 using Molviz::gfx::Shader;
