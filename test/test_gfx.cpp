@@ -2,16 +2,15 @@
 #include <SDL.h>
 #include <catch2/catch_test_macros.hpp>
 #include <spdlog/spdlog.h>
-#include <utility>
 
 #include "gfx/elementbuffer.hpp"
 #include "gfx/mesh.hpp"
+#include "gfx/model.hpp"
 #include "gfx/shader.hpp"
 #include "gfx/vertexarray.hpp"
 #include "gfx/vertexbuffer.hpp"
 
 // utilities
-
 std::pair<SDL_Window *, SDL_GLContext> create_dummy_opengl_context()
 {
   // init SDL
@@ -43,8 +42,7 @@ void cleanup_dummy_opengl_context(SDL_Window *tp_window, SDL_GLContext t_context
   SDL_Quit();
 }
 
-// unit tests
-
+// test cases
 TEST_CASE("ElementBuffer valid creation and cleanup", "[ElementBuffer, EBO]")
 {
   using namespace Molviz::gfx;
@@ -142,5 +140,12 @@ TEST_CASE("Mesh valid creation and cleanup", "[Mesh]")
 
   auto [p_window, context]{ create_dummy_opengl_context() };
 
-  Mesh mesh{ vertices, indices };
+  REQUIRE_NOTHROW(Mesh(vertices, indices));
+}
+
+TEST_CASE("Model valid creation and cleanup", "[Model]")
+{
+  using namespace Molviz::gfx;
+
+  REQUIRE_NOTHROW(Model("/workspaces/molviz/test/resources/meshes/cube/cube.gltf"));
 }

@@ -19,20 +19,26 @@ endif()
 
 include(${Catch2_SOURCE_DIR}/extras/Catch.cmake)
 
-# Provide a simple smoke test to make sure that the CLI works and can display a
+# provide a simple smoke test to make sure that the CLI works and can display a
 # --help message
-add_test(NAME cli.has_help COMMAND morse --help)
+add_test(NAME cli.has_help COMMAND ${CMAKE_PROJECT_NAME} --help)
 
-# Provide a test to verify that the version being reported from the application
+# provide a test to verify that the version being reported from the application
 # matches the version given to CMake. This will be important once you package
 # your program. Real world shows that this is the kind of simple mistake that is
 # easy to make, but also easy to test for.
-add_test(NAME cli.version_matches COMMAND morse --version)
+add_test(NAME cli.version_matches COMMAND ${CMAKE_PROJECT_NAME} --version)
 set_tests_properties(cli.version_matches PROPERTIES PASS_REGULAR_EXPRESSION "${PROJECT_VERSION}")
 
 # ---- Test binaries ----
 
-add_executable(tests tests.cpp)
+file(
+  GLOB
+  TESTS_SRCS
+  CONFIGURE_DEPENDS
+  ${CMAKE_CURRENT_SOURCE_DIR}/test_*.cpp)
+
+add_executable(tests ${TESTS_SRCS})
 target_link_libraries(
   tests
   PRIVATE ${CMAKE_PROJECT_NAME}::project_warnings
@@ -72,6 +78,8 @@ catch_discover_tests(
   "unittests."
   OUTPUT_SUFFIX
   .xml)
+
+# ---- Constexpr tests ----
 
 # Add a file containing a set of constexpr tests
 add_executable(constexpr_tests constexpr_tests.cpp)
