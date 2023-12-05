@@ -51,18 +51,16 @@ std::vector<float> Model::get_floats(nlohmann::json t_accessor)
   unsigned int byte_offset{ buffer_view["byteOffset"] };
   unsigned int number_per_vertex;
 
-  // TODO: refactor to use sizeof
   if (type == "SCALAR")
-    number_per_vertex = 1;
+    number_per_vertex = sizeof(glm::f32) / sizeof(float);
   else if (type == "VEC2")
-    number_per_vertex = 2;
+    number_per_vertex = sizeof(glm::vec2) / sizeof(float);
   else if (type == "VEC3")
-    number_per_vertex = 3;
+    number_per_vertex = sizeof(glm::vec3) / sizeof(float);
   else if (type == "VEC4")
-    number_per_vertex = 4;
+    number_per_vertex = sizeof(glm::vec4) / sizeof(float);
   else {
-    spdlog::error("type is invalid {} given", type);
-    throw std::invalid_argument("type is invalid");
+    InvalidArgumentLogged(fmt::format("type is invalid {} given", type));
   }
 
   unsigned int data_begin = byte_offset + access_byte_offset;
@@ -74,7 +72,6 @@ std::vector<float> Model::get_floats(nlohmann::json t_accessor)
     std::memcpy(&value, bytes, sizeof(float));
     float_vector.push_back(value);
   }
-
   return float_vector;
 }
 
@@ -113,9 +110,7 @@ std::vector<GLuint> Model::get_indices(nlohmann::json t_accessor)
       indices.push_back((GLuint)(value));
     }
   }
-
   spdlog::debug("loaded {} indices", indices.size());
-
   return indices;
 }
 
@@ -127,26 +122,26 @@ std::vector<Vertex> Model::assemble_vertices(std::vector<glm::vec3> t_positions,
   for (std::size_t i{ 0 }; i < t_positions.size(); ++i) {
     vertices.push_back(Vertex(t_positions[i], t_normals[i], glm::vec3(1.0F, 1.0F, 1.0F)));
   }
-
   spdlog::debug("loaded {} vertices", vertices.size());
-
   return vertices;
 }
 
 std::vector<glm::vec2> Model::group_floats_vec2(std::vector<float> t_floats)
 {
   std::vector<glm::vec2> vectors;
-  if (t_floats.size() % 2 != 0) { spdlog::warn("floats vector size not divisible by 2"); }
-  for (std::size_t i{ 0 }; i < t_floats.size(); i) { vectors.push_back(glm::vec2(t_floats[i++], t_floats[i++])); }
+  if (t_floats.size() % 2 != 0) { RuntimeErrorLogged("floats vector size not divisible by 2"); }
+  for (std::size_t i{ 0 }; i < t_floats.size() / 2; i += 2) {
+    vectors.push_back(glm::vec2(t_floats[i + 0], t_floats[i + 1]));
+  }
   return vectors;
 }
 
 std::vector<glm::vec3> Model::group_floats_vec3(std::vector<float> t_floats)
 {
   std::vector<glm::vec3> vectors;
-  if (t_floats.size() % 3 != 0) { spdlog::warn("floats vector size not divisible by 3"); }
-  for (std::size_t i{ 0 }; i < t_floats.size(); i) {
-    vectors.push_back(glm::vec3(t_floats[i++], t_floats[i++], t_floats[i++]));
+  if (t_floats.size() % 3 != 0) { RuntimeErrorLogged("floats vector size not divisible by 3"); }
+  for (std::size_t i{ 0 }; i < t_floats.size() / 3; i += 3) {
+    vectors.push_back(glm::vec3(t_floats[i + 0], t_floats[i + 1], t_floats[i + 2]));
   }
   return vectors;
 }
@@ -154,16 +149,16 @@ std::vector<glm::vec3> Model::group_floats_vec3(std::vector<float> t_floats)
 std::vector<glm::vec4> Model::group_floats_vec4(std::vector<float> t_floats)
 {
   std::vector<glm::vec4> vectors;
-  if (t_floats.size() % 4 != 0) { spdlog::warn("floats vector size not divisible by 4"); }
-  for (std::size_t i{ 0 }; i < t_floats.size(); i) {
-    vectors.push_back(glm::vec4(t_floats[i++], t_floats[i++], t_floats[i++], t_floats[i++]));
+  if (t_floats.size() % 4 != 0) { RuntimeErrorLogged("floats vector size not divisible by 4"); }
+  for (std::size_t i{ 0 }; i < t_floats.size() / 4; i += 4) {
+    vectors.push_back(glm::vec4(t_floats[i + 0], t_floats[i + 1], t_floats[i + 2], t_floats[i + 3]));
   }
   return vectors;
 }
 
 void Model::load_mesh(unsigned int t_mesh_index)
 {
-  //!! WARNING: do not use curly brace initialization with json, internal types mismatch
+  //!! WARNING: do not use curly brace initialization with json lib types, internal types mismatch
   unsigned int position_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["attributes"]["POSITION"];
   unsigned int normal_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["attributes"]["NORMAL"];
   unsigned int index_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["indices"];
@@ -185,7 +180,7 @@ void Model::load_mesh(unsigned int t_mesh_index)
 void Model::traverse_node(unsigned int t_next_node, glm::mat4 t_matrix)
 {
   // current node
-  //!! WARNING: do not use curly brace initialization, types mismatch
+  //!! WARNING: do not use curly brace initialization with json lib types, internal types mismatch
   nlohmann::json node = m_json["nodes"][t_next_node];
 
   spdlog::debug("processing node {}", t_next_node);
@@ -195,7 +190,6 @@ void Model::traverse_node(unsigned int t_next_node, glm::mat4 t_matrix)
   if (node.find("translation") != node.end()) {
     spdlog::debug("node has translation");
     float translation_values[3];
-    // TODO: this loop should be replaced with assignment because it can overflow
     for (std::size_t i{ 0 }; i < node["translation"].size(); ++i) { translation_values[i] = (node["translation"][i]); }
     translation = glm::make_vec3(translation_values);
   }

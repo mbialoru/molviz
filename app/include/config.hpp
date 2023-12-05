@@ -18,6 +18,6 @@ inline constexpr std::string_view BUILD_TYPE{ "Debug" };
 inline constexpr std::string_view PLATFORM{ "Linux" };
 inline constexpr std::string_view COMPILER{ "GNU" };
 inline constexpr std::string_view COMPILER_VERSION{ "13.2.0" };
-inline constexpr std::string_view BUILD_DATE{ "2023-12-05 16:15:54 UTC" };
+inline constexpr std::string_view BUILD_DATE{ "2023-12-04 12:36:38 UTC" };
 
 #endif// MOLVIZ_CONFIG_HPP
