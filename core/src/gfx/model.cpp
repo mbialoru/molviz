@@ -2,8 +2,7 @@
 
 using namespace Molviz::gfx;
 
-// TODO: refactor with tests
-// TODO: unsigned int to std::size_t
+// TODO: refactor and tests
 
 Model::Model(const char *tp_file)
 {
@@ -60,7 +59,7 @@ std::vector<float> Model::get_floats(nlohmann::json t_accessor)
   else if (type == "VEC4")
     number_per_vertex = sizeof(glm::vec4) / sizeof(float);
   else {
-    InvalidArgumentLogged(fmt::format("type is invalid {} given", type));
+    throw InvalidArgumentLogged(fmt::format("type is invalid {} given", type));
   }
 
   unsigned int data_begin = byte_offset + access_byte_offset;
@@ -117,6 +116,7 @@ std::vector<GLuint> Model::get_indices(nlohmann::json t_accessor)
 std::vector<Vertex> Model::assemble_vertices(std::vector<glm::vec3> t_positions, std::vector<glm::vec3> t_normals)
 {
   // TODO: color here is fullbright white, would be nice to affect it
+  // TODO: gltf has color data, index `COLOR_0` we should read that from file
   std::vector<Vertex> vertices;
 
   for (std::size_t i{ 0 }; i < t_positions.size(); ++i) {
@@ -126,39 +126,9 @@ std::vector<Vertex> Model::assemble_vertices(std::vector<glm::vec3> t_positions,
   return vertices;
 }
 
-std::vector<glm::vec2> Model::group_floats_vec2(std::vector<float> t_floats)
-{
-  std::vector<glm::vec2> vectors;
-  if (t_floats.size() % 2 != 0) { RuntimeErrorLogged("floats vector size not divisible by 2"); }
-  for (std::size_t i{ 0 }; i < t_floats.size() / 2; i += 2) {
-    vectors.push_back(glm::vec2(t_floats[i + 0], t_floats[i + 1]));
-  }
-  return vectors;
-}
-
-std::vector<glm::vec3> Model::group_floats_vec3(std::vector<float> t_floats)
-{
-  std::vector<glm::vec3> vectors;
-  if (t_floats.size() % 3 != 0) { RuntimeErrorLogged("floats vector size not divisible by 3"); }
-  for (std::size_t i{ 0 }; i < t_floats.size() / 3; i += 3) {
-    vectors.push_back(glm::vec3(t_floats[i + 0], t_floats[i + 1], t_floats[i + 2]));
-  }
-  return vectors;
-}
-
-std::vector<glm::vec4> Model::group_floats_vec4(std::vector<float> t_floats)
-{
-  std::vector<glm::vec4> vectors;
-  if (t_floats.size() % 4 != 0) { RuntimeErrorLogged("floats vector size not divisible by 4"); }
-  for (std::size_t i{ 0 }; i < t_floats.size() / 4; i += 4) {
-    vectors.push_back(glm::vec4(t_floats[i + 0], t_floats[i + 1], t_floats[i + 2], t_floats[i + 3]));
-  }
-  return vectors;
-}
-
 void Model::load_mesh(unsigned int t_mesh_index)
 {
-  //!! WARNING: do not use curly brace initialization with json lib types, internal types mismatch
+  //!! WARNING: do not use curly brace initialization with json lib types, internal types mismatch shenanigans
   unsigned int position_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["attributes"]["POSITION"];
   unsigned int normal_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["attributes"]["NORMAL"];
   unsigned int index_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["indices"];
@@ -180,7 +150,7 @@ void Model::load_mesh(unsigned int t_mesh_index)
 void Model::traverse_node(unsigned int t_next_node, glm::mat4 t_matrix)
 {
   // current node
-  //!! WARNING: do not use curly brace initialization with json lib types, internal types mismatch
+  //!! WARNING: do not use curly brace initialization with json lib types, internal types mismatch shenanigans
   nlohmann::json node = m_json["nodes"][t_next_node];
 
   spdlog::debug("processing node {}", t_next_node);
