@@ -1,20 +1,3 @@
-cmake_minimum_required(VERSION 3.15...3.23)
-
-project(CmakeConfigPackageTests LANGUAGES CXX)
-
-# ---- Test as standalone project the exported config package ----
-
-if(PROJECT_IS_TOP_LEVEL OR TEST_INSTALLED_VERSION)
-  enable_testing()
-
-  find_package(${CMAKE_PROJECT_NAME} CONFIG REQUIRED)
-
-  if(NOT TARGET project_options)
-    message(FATAL_ERROR "Requiered config package not found!")
-    return() # be strictly paranoid for Template Janitor github action! CK
-  endif()
-endif()
-
 # ---- Dependencies ----
 
 include(${Catch2_SOURCE_DIR}/extras/Catch.cmake)
@@ -81,7 +64,7 @@ catch_discover_tests(
 
 # ---- Constexpr tests ----
 
-# Add a file containing a set of constexpr tests
+# add a file containing a set of constexpr tests
 add_executable(constexpr_tests constexpr_tests.cpp)
 target_link_libraries(
   constexpr_tests
@@ -103,7 +86,7 @@ catch_discover_tests(
   OUTPUT_SUFFIX
   .xml)
 
-# Disable the constexpr portion of the test, and build again this allows us to
+# disable the constexpr portion of the test, and build again this allows us to
 # have an executable that we can debug when things go wrong with the constexpr
 # testing
 add_executable(relaxed_constexpr_tests constexpr_tests.cpp)
