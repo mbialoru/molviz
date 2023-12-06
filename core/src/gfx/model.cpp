@@ -36,6 +36,11 @@ std::vector<unsigned char> Model::get_data()
   return data;
 }
 
+// TODO: get_floats and get_indices functions can be unified to be one universal
+// tool for scraping data from gltf instead of relying on concrete types to be
+// available in gltf file, this is in regards to color which is a VEC4 of
+// unsigned shorts, it would require a new function all together.
+
 std::vector<float> Model::get_floats(nlohmann::json t_accessor)
 {
   std::vector<float> float_vector;
@@ -113,14 +118,14 @@ std::vector<GLuint> Model::get_indices(nlohmann::json t_accessor)
   return indices;
 }
 
-std::vector<Vertex> Model::assemble_vertices(std::vector<glm::vec3> t_positions, std::vector<glm::vec3> t_normals)
+std::vector<Vertex> Model::assemble_vertices(std::vector<glm::vec3> t_positions,
+  std::vector<glm::vec3> t_normals,
+  std::vector<glm::vec4> t_colors)
 {
-  // TODO: color here is fullbright white, would be nice to affect it
-  // TODO: gltf has color data, index `COLOR_0` we should read that from file
   std::vector<Vertex> vertices;
 
   for (std::size_t i{ 0 }; i < t_positions.size(); ++i) {
-    vertices.push_back(Vertex(t_positions[i], t_normals[i], glm::vec3(1.0F, 1.0F, 1.0F)));
+    vertices.push_back(Vertex(t_positions[i], t_normals[i], glm::vec3(t_colors[i].r, t_colors[i].g, t_colors[i].b)));
   }
   spdlog::debug("loaded {} vertices", vertices.size());
   return vertices;
@@ -129,9 +134,14 @@ std::vector<Vertex> Model::assemble_vertices(std::vector<glm::vec3> t_positions,
 void Model::load_mesh(unsigned int t_mesh_index)
 {
   //!! WARNING: do not use curly brace initialization with json lib types, internal types mismatch shenanigans
+  // NOTE: Color is not always available, we have to handle when it's not.
+  unsigned int color_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["attributes"]["COLOR_0"];
   unsigned int position_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["attributes"]["POSITION"];
   unsigned int normal_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["attributes"]["NORMAL"];
   unsigned int index_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["indices"];
+
+  std::vector<float> color_vector{ get_floats(m_json["accessors"][color_access_index]) };
+  std::vector<glm::vec4> colors{ group_floats_vec4(color_vector) };
 
   std::vector<float> position_vector{ get_floats(m_json["accessors"][position_access_index]) };
   std::vector<glm::vec3> positions{ group_floats_vec3(position_vector) };
@@ -139,7 +149,7 @@ void Model::load_mesh(unsigned int t_mesh_index)
   std::vector<float> normal_vector{ get_floats(m_json["accessors"][normal_access_index]) };
   std::vector<glm::vec3> normals{ group_floats_vec3(normal_vector) };
 
-  std::vector<Vertex> vertices{ assemble_vertices(positions, normals) };
+  std::vector<Vertex> vertices{ assemble_vertices(positions, normals, colors) };
   std::vector<GLuint> indices{ get_indices(m_json["accessors"][index_access_index]) };
 
   m_meshes.push_back(Mesh(vertices, indices));

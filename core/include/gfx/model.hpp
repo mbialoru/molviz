@@ -22,7 +22,9 @@ private:
   std::vector<float> get_floats(nlohmann::json t_accessor);
   std::vector<GLuint> get_indices(nlohmann::json t_accessor);
 
-  std::vector<Vertex> assemble_vertices(std::vector<glm::vec3> t_positions, std::vector<glm::vec3> t_normals);
+  std::vector<Vertex> assemble_vertices(std::vector<glm::vec3> t_positions,
+    std::vector<glm::vec3> t_normals,
+    std::vector<glm::vec4> t_colors);
 
   void load_mesh(unsigned int t_mesh_index);
   void traverse_node(unsigned int t_next_node, glm::mat4 t_matrix = glm::mat4(1.0F));

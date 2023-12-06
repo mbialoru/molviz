@@ -105,8 +105,8 @@ TEST_CASE("Shader valid creation and cleanup", "[Shader]")
 {
   using namespace Molviz::gfx;
 
-  std::filesystem::path vertex_shader{ "/workspaces/molviz/test/resources/default.frag" };
-  std::filesystem::path fragment_shader{ "/workspaces/molviz/test/resources/default.frag" };
+  std::filesystem::path vertex_shader{ "/workspaces/molviz/test/resources/shaders/empty.vert" };
+  std::filesystem::path fragment_shader{ "/workspaces/molviz/test/resources/shaders/empty.frag" };
 
   auto [p_window, context]{ create_dummy_opengl_context() };
 
@@ -147,5 +147,9 @@ TEST_CASE("Model valid creation and cleanup", "[Model]")
 {
   using namespace Molviz::gfx;
 
-  REQUIRE_NOTHROW(Model("/workspaces/molviz/test/resources/meshes/cube/cube.gltf"));
+  auto [p_window, context]{ create_dummy_opengl_context() };
+
+  REQUIRE_NOTHROW(Model("/workspaces/molviz/test/resources/meshes/cube_color/cube_color.gltf"));
+
+  cleanup_dummy_opengl_context(p_window, context);
 }
