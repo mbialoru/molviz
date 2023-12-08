@@ -3,6 +3,7 @@
 using namespace Molviz::gfx;
 
 // TODO: refactor and tests
+// TODO: unsigned int to std::size_t and use fixed size ints from cstdint
 
 Model::Model(const char *tp_file)
 {
@@ -19,10 +20,10 @@ Model::Model(const char *tp_file)
 
 void Model::draw(Shader &tr_shader, Camera &tr_camera)
 {
-  for (std::size_t i{ 0 }; i < m_meshes.size(); ++i) { m_meshes[i].draw(tr_shader, tr_camera, m_matrices_meshes[i]); }
+  for (std::size_t i{ 0 }; i < m_meshes.size(); ++i) { m_meshes[i].draw(tr_shader, tr_camera, m_meshes_matrices[i]); }
 }
 
-std::vector<unsigned char> Model::get_data()
+std::vector<uint8_t> Model::get_data()
 {
   std::string uri = m_json["buffers"][0]["uri"];
 
@@ -31,7 +32,7 @@ std::vector<unsigned char> Model::get_data()
   std::string file_directory{ file_string.substr(0, file_string.find_last_of('/') + 1) };
   std::string bytes_text{ file_contents_to_string((file_directory + uri).c_str()) };
 
-  std::vector<unsigned char> data{ bytes_text.begin(), bytes_text.end() };
+  std::vector<uint8_t> data{ bytes_text.begin(), bytes_text.end() };
 
   return data;
 }
@@ -45,15 +46,15 @@ std::vector<float> Model::get_floats(nlohmann::json t_accessor)
 {
   std::vector<float> float_vector;
 
-  unsigned int buffer_view_index = t_accessor.value("bufferView", 1);
-  unsigned int count = t_accessor["count"];
-  unsigned int access_byte_offset = t_accessor.value("byteOffset", 0);
+  std::size_t buffer_view_index = t_accessor.value("bufferView", 1);
+  std::size_t count = t_accessor["count"];
+  std::size_t access_byte_offset = t_accessor.value("byteOffset", 0);
 
   std::string type = t_accessor["type"];
 
   nlohmann::json buffer_view = m_json["bufferViews"][buffer_view_index];
-  unsigned int byte_offset{ buffer_view["byteOffset"] };
-  unsigned int number_per_vertex;
+  std::size_t byte_offset{ buffer_view["byteOffset"] };
+  std::size_t number_per_vertex;
 
   if (type == "SCALAR")
     number_per_vertex = sizeof(glm::f32) / sizeof(float);
@@ -67,11 +68,11 @@ std::vector<float> Model::get_floats(nlohmann::json t_accessor)
     throw InvalidArgumentLogged(fmt::format("type is invalid {} given", type));
   }
 
-  unsigned int data_begin = byte_offset + access_byte_offset;
-  unsigned int data_size = count * 4 * number_per_vertex;
+  std::size_t data_begin = byte_offset + access_byte_offset;
+  std::size_t data_size = count * 4 * number_per_vertex;
 
   for (std::size_t i{ data_begin }; i < data_begin + data_size; i) {
-    unsigned char bytes[] = { m_data[i++], m_data[i++], m_data[i++], m_data[i++] };
+    uint8_t bytes[] = { m_data[i++], m_data[i++], m_data[i++], m_data[i++] };
     float value;
     std::memcpy(&value, bytes, sizeof(float));
     float_vector.push_back(value);
@@ -83,35 +84,35 @@ std::vector<GLuint> Model::get_indices(nlohmann::json t_accessor)
 {
   std::vector<GLuint> indices;
 
-  unsigned int buffer_view_index = t_accessor.value("bufferView", 0);
-  unsigned int count = t_accessor["count"];
-  unsigned int access_byte_offset = t_accessor.value("byteOffset", 0);
-  unsigned int component_type = t_accessor["componentType"];
+  std::size_t buffer_view_index = t_accessor.value("bufferView", 0);
+  std::size_t count = t_accessor["count"];
+  std::size_t access_byte_offset = t_accessor.value("byteOffset", 0);
+  std::size_t component_type = t_accessor["componentType"];
 
   nlohmann::json buffer_view = m_json["bufferViews"][buffer_view_index];
-  unsigned int byte_offset = buffer_view["byteOffset"];
-  unsigned int data_begin = byte_offset + access_byte_offset;
+  std::size_t byte_offset = buffer_view["byteOffset"];
+  std::size_t data_begin = byte_offset + access_byte_offset;
 
   if (component_type == 5125) {// UNSIGNED_INT
     for (std::size_t i{ data_begin }; i < byte_offset + access_byte_offset + count * 4; i) {
-      unsigned char bytes[] = { m_data[i++], m_data[i++], m_data[i++], m_data[i++] };
-      unsigned int value;
-      std::memcpy(&value, bytes, sizeof(unsigned int));
-      indices.push_back((GLuint)(value));
+      uint8_t bytes[] = { m_data[i++], m_data[i++], m_data[i++], m_data[i++] };
+      uint32_t value;
+      std::memcpy(&value, bytes, sizeof(uint32_t));
+      indices.push_back(static_cast<GLuint>(value));
     }
   } else if (component_type == 5123) {// UNSIGNED_SHORT
     for (std::size_t i{ data_begin }; i < byte_offset + access_byte_offset + count * 2; i) {
-      unsigned char bytes[] = { m_data[i++], m_data[i++] };
-      unsigned short value;
-      std::memcpy(&value, bytes, sizeof(unsigned short));
-      indices.push_back((GLuint)(value));
+      uint8_t bytes[] = { m_data[i++], m_data[i++] };
+      uint16_t value;
+      std::memcpy(&value, bytes, sizeof(uint16_t));
+      indices.push_back(static_cast<GLuint>(value));
     }
   } else if (component_type == 5122) {// SHORT
     for (std::size_t i{ data_begin }; i < byte_offset + access_byte_offset + count * 2; i) {
-      unsigned char bytes[] = { m_data[i++], m_data[i++] };
-      short value;
-      std::memcpy(&value, bytes, sizeof(short));
-      indices.push_back((GLuint)(value));
+      uint8_t bytes[] = { m_data[i++], m_data[i++] };
+      int16_t value;
+      std::memcpy(&value, bytes, sizeof(int16_t));
+      indices.push_back(static_cast<GLuint>(value));
     }
   }
   spdlog::debug("loaded {} indices", indices.size());
@@ -125,29 +126,29 @@ std::vector<Vertex> Model::assemble_vertices(std::vector<glm::vec3> t_positions,
   std::vector<Vertex> vertices;
 
   for (std::size_t i{ 0 }; i < t_positions.size(); ++i) {
-    vertices.push_back(Vertex(t_positions[i], t_normals[i], glm::vec3(t_colors[i].r, t_colors[i].g, t_colors[i].b)));
+    vertices.emplace_back(t_positions[i], t_normals[i], glm::vec3(1.0F, 1.0F, 1.0F));
   }
   spdlog::debug("loaded {} vertices", vertices.size());
   return vertices;
 }
 
-void Model::load_mesh(unsigned int t_mesh_index)
+void Model::load_mesh(std::size_t t_mesh_index)
 {
   //!! WARNING: do not use curly brace initialization with json lib types, internal types mismatch shenanigans
   // NOTE: Color is not always available, we have to handle when it's not.
-  unsigned int color_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["attributes"]["COLOR_0"];
-  unsigned int position_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["attributes"]["POSITION"];
-  unsigned int normal_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["attributes"]["NORMAL"];
-  unsigned int index_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["indices"];
+  std::size_t color_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["attributes"]["COLOR_0"];
+  std::size_t position_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["attributes"]["POSITION"];
+  std::size_t normal_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["attributes"]["NORMAL"];
+  std::size_t index_access_index = m_json["meshes"][t_mesh_index]["primitives"][0]["indices"];
 
   std::vector<float> color_vector{ get_floats(m_json["accessors"][color_access_index]) };
-  std::vector<glm::vec4> colors{ group_floats_vec4(color_vector) };
+  std::vector<glm::vec4> colors{ group_data_vec4<float>(color_vector) };
 
   std::vector<float> position_vector{ get_floats(m_json["accessors"][position_access_index]) };
-  std::vector<glm::vec3> positions{ group_floats_vec3(position_vector) };
+  std::vector<glm::vec3> positions{ group_data_vec3<float>(position_vector) };
 
   std::vector<float> normal_vector{ get_floats(m_json["accessors"][normal_access_index]) };
-  std::vector<glm::vec3> normals{ group_floats_vec3(normal_vector) };
+  std::vector<glm::vec3> normals{ group_data_vec3<float>(normal_vector) };
 
   std::vector<Vertex> vertices{ assemble_vertices(positions, normals, colors) };
   std::vector<GLuint> indices{ get_indices(m_json["accessors"][index_access_index]) };
@@ -157,7 +158,7 @@ void Model::load_mesh(unsigned int t_mesh_index)
   spdlog::debug("loaded mesh {}", t_mesh_index);
 }
 
-void Model::traverse_node(unsigned int t_next_node, glm::mat4 t_matrix)
+void Model::traverse_node(std::size_t t_next_node, glm::mat4 t_matrix)
 {
   // current node
   //!! WARNING: do not use curly brace initialization with json lib types, internal types mismatch shenanigans
@@ -214,10 +215,10 @@ void Model::traverse_node(unsigned int t_next_node, glm::mat4 t_matrix)
   if (node.find("mesh") != node.end()) {
     spdlog::debug("node has mesh");
 
-    m_translation_meshes.push_back(translation);
-    m_rotation_meshes.push_back(rotation);
-    m_scale_meshes.push_back(scale);
-    m_matrices_meshes.push_back(matrix_next_node);
+    m_meshes_translations.push_back(translation);
+    m_meshes_rotations.push_back(rotation);
+    m_meshes_scales.push_back(scale);
+    m_meshes_matrices.push_back(matrix_next_node);
 
     load_mesh(node["mesh"]);
   }
