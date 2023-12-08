@@ -18,7 +18,7 @@ public:
   void draw(Shader &tr_shader, Camera &tr_camera);
 
 private:
-  std::vector<unsigned char> get_data();
+  std::vector<uint8_t> get_data();
   std::vector<float> get_floats(nlohmann::json t_accessor);
   std::vector<GLuint> get_indices(nlohmann::json t_accessor);
 
@@ -26,20 +26,20 @@ private:
     std::vector<glm::vec3> t_normals,
     std::vector<glm::vec4> t_colors);
 
-  void load_mesh(unsigned int t_mesh_index);
-  void traverse_node(unsigned int t_next_node, glm::mat4 t_matrix = glm::mat4(1.0F));
+  void load_mesh(std::size_t t_mesh_index);
+  void traverse_node(std::size_t t_next_node, glm::mat4 t_matrix = glm::mat4(1.0F));
 
   const char *mp_file;
 
-  std::vector<unsigned char> m_data;
+  std::vector<uint8_t> m_data;
 
   nlohmann::json m_json;
 
   std::vector<Mesh> m_meshes;
-  std::vector<glm::vec3> m_translation_meshes;
-  std::vector<glm::vec3> m_scale_meshes;
-  std::vector<glm::quat> m_rotation_meshes;
-  std::vector<glm::mat4> m_matrices_meshes;
+  std::vector<glm::vec3> m_meshes_translations;
+  std::vector<glm::vec3> m_meshes_scales;
+  std::vector<glm::quat> m_meshes_rotations;
+  std::vector<glm::mat4> m_meshes_matrices;
 };
 
 };// namespace Molviz::gfx
