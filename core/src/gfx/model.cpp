@@ -20,7 +20,10 @@ Model::Model(const char *tp_file)
 
 void Model::draw(Shader &tr_shader, Camera &tr_camera)
 {
-  for (std::size_t i{ 0 }; i < m_meshes.size(); ++i) { m_meshes[i].draw(tr_shader, tr_camera, m_meshes_matrices[i]); }
+  for (std::size_t i{ 0 }; i < m_meshes.size(); ++i) {
+    m_meshes[i].draw(
+      tr_shader, tr_camera, m_meshes_matrices[i], m_meshes_translations[i], m_meshes_rotations[i], m_meshes_scales[i]);
+  }
 }
 
 std::vector<uint8_t> Model::get_data()

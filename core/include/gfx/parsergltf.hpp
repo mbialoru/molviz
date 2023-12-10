@@ -5,20 +5,84 @@
 
 #include <nlohmann/json.hpp>
 
-#include "mesh.hpp"
+#include "model.hpp"
 
 namespace Molviz::gfx {
 
 class ParserGLTF
 {
 public:
+  ParserGLTF();
   ParserGLTF(const char *tp_file);
   ParserGLTF(const std::string &tr_file);
   ParserGLTF(const std::filesystem::path &tr_file);
   ~ParserGLTF() = default;
 
+  void parse(const char *tp_file);
+  void parse(const std::string &tr_file);
+  void parse(const std::filesystem::path &tr_file);
+
+  Model get_model();
+
 private:
   std::vector<uint8_t> load_bin_file();
+
+  std::vector<Vertex> assemble_vertices(std::vector<glm::vec3> t_positions,
+    std::vector<glm::vec3> t_normals,
+    std::vector<glm::vec4> t_colors);
+
+  void process_node(const std::size_t t_next_node, const glm::mat4 t_matrix = glm::mat4(1.0F));
+  void load_mesh(const std::size_t t_mesh_index);
+
+  template<typename T> std::vector<glm::vec<2, T, glm::defaultp>> group_into_vec2(const std::vector<T> &tr_data)
+  {
+    if (tr_data.size() % 2 != 0) { throw InvalidArgumentLogged(fmt::format("vector length not divisible by {}", 2)); }
+
+    std::vector<glm::vec<2, T, glm::defaultp>> grouped;
+
+    for (std::size_t i{ 0 }; i < tr_data.size() / 2; i += 2) { grouped.emplace_back(tr_data[i + 0], tr_data[i + 1]); }
+
+    return grouped;
+  };
+
+  template<typename T> std::vector<glm::vec<3, T, glm::defaultp>> group_into_vec3(const std::vector<T> &tr_data)
+  {
+    if (tr_data.size() % 3 != 0) { throw InvalidArgumentLogged(fmt::format("vector length not divisible by {}", 3)); }
+
+    std::vector<glm::vec<3, T, glm::defaultp>> grouped;
+
+    for (std::size_t i{ 0 }; i < tr_data.size() / 3; i += 3) {
+      grouped.emplace_back(tr_data[i + 0], tr_data[i + 1], tr_data[i + 2]);
+    }
+    return grouped;
+  };
+
+  template<typename T> std::vector<glm::vec<4, T, glm::defaultp>> group_into_vec4(const std::vector<T> &tr_data)
+  {
+    if (tr_data.size() % 4 != 0) { throw InvalidArgumentLogged(fmt::format("vector length not divisible by {}", 4)); }
+
+    std::vector<glm::vec<4, T, glm::defaultp>> grouped;
+
+    for (std::size_t i{ 0 }; i < tr_data.size() / 4; i += 4) {
+      grouped.emplace_back(tr_data[i + 0], tr_data[i + 1], tr_data[i + 2], tr_data[i + 3]);
+    }
+    return grouped;
+  };
+
+  template<typename T> std::size_t get_vertex_stride(const std::string t_type)
+  {
+    if (t_type == "SCALAR")
+      return 1;
+    else if (t_type == "VEC2")
+      return sizeof(glm::vec<2, T, glm::qualifier::defaultp>) / sizeof(T);
+    else if (t_type == "VEC3")
+      return sizeof(glm::vec<3, T, glm::qualifier::defaultp>) / sizeof(T);
+    else if (t_type == "VEC4")
+      return sizeof(glm::vec<4, T, glm::qualifier::defaultp>) / sizeof(T);
+    else {
+      throw InvalidArgumentLogged(fmt::format("type is invalid {} given", t_type));
+    }
+  }
 
   template<typename T> std::vector<uint8_t> get_accessor_data(nlohmann::json t_accessor)
   {
@@ -42,29 +106,9 @@ private:
     }
   }
 
-  template<typename T> std::vector<T> convert_accessor_data(const std::vector<uint8_t> &tr_data)
-  {
-    if (tr_data.size() % sizeof(T) != 0) {
-      throw InvalidArgumentLogged(fmt::format("vector length not divisible by {}", sizeof(T)));
-    }
-
-    std::vector<T> converted_data;
-
-    for (std::size_t i{ 0 }; i < tr_data.size() / sizeof(T); i += sizeof(T)) {
-      std::array<uint8_t, sizeof(T)> bytes;
-      for (std::size_t i{ 0 }; i < sizeof(T); ++i) { bytes[i] = m_data[i]; }
-      T value;
-      std::memmove(&value, bytes, sizeof(T));
-      converted_data.push_back(value);
-    }
-    return converted_data;
-  }
+  nlohmann::json m_json;
 
   std::filesystem::path m_path;
-
-  std::vector<uint8_t> m_model_bin_data;
-
-  nlohmann::json m_json;
 
   std::vector<uint8_t> m_data;
 };
