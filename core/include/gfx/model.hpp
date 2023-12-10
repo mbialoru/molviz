@@ -18,22 +18,15 @@ public:
   void draw(Shader &tr_shader, Camera &tr_camera);
 
 private:
-  std::vector<uint8_t> get_data();
-  std::vector<float> get_floats(nlohmann::json t_accessor);
-  std::vector<GLuint> get_indices(nlohmann::json t_accessor);
+  // std::vector<uint8_t> get_data();
+  // std::vector<float> get_floats(nlohmann::json t_accessor);
+  // std::vector<GLuint> get_indices(nlohmann::json t_accessor);
 
-  std::vector<Vertex> assemble_vertices(std::vector<glm::vec3> t_positions,
-    std::vector<glm::vec3> t_normals,
-    std::vector<glm::vec4> t_colors);
+  // std::vector<Vertex> assemble_vertices(std::vector<glm::vec3> t_positions,
+  //   std::vector<glm::vec3> t_normals,
+  //   std::vector<glm::vec4> t_colors);
 
-  void load_mesh(std::size_t t_mesh_index);
-  void traverse_node(std::size_t t_next_node, glm::mat4 t_matrix = glm::mat4(1.0F));
-
-  const char *mp_file;
-
-  std::vector<uint8_t> m_data;
-
-  nlohmann::json m_json;
+  // void load_mesh(std::size_t t_mesh_index);
 
   std::vector<Mesh> m_meshes;
   std::vector<glm::vec3> m_meshes_translations;
