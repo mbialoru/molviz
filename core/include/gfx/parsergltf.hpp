@@ -33,6 +33,7 @@ private:
 
   void process_node(const std::size_t t_next_node, const glm::mat4 t_matrix = glm::mat4(1.0F));
   void load_mesh(const std::size_t t_mesh_index);
+  void cleanup();
 
   template<typename T> std::vector<glm::vec<2, T, glm::defaultp>> group_into_vec2(const std::vector<T> &tr_data)
   {
@@ -84,7 +85,7 @@ private:
     }
   }
 
-  template<typename T> std::vector<uint8_t> get_accessor_data(nlohmann::json t_accessor)
+  template<typename T> std::vector<uint8_t> h_get_accessor_data(nlohmann::json t_accessor)
   {
     //!! WARNING: do not use curly brace initialization with json lib types, internal types mismatch shenanigans
     std::size_t buffer_view_index = t_accessor.value("bufferView", 1);
@@ -106,11 +107,19 @@ private:
     }
   }
 
-  nlohmann::json m_json;
+  std::vector<uint8_t> get_accessor_data(nlohmann::json t_accessor);
+
+  std::vector<uint8_t> m_data;
 
   std::filesystem::path m_path;
 
-  std::vector<uint8_t> m_data;
+  nlohmann::json m_json;
+
+  std::vector<Mesh> m_meshes;
+  std::vector<glm::vec3> m_translations;
+  std::vector<glm::vec3> m_scales;
+  std::vector<glm::quat> m_rotations;
+  std::vector<glm::mat4> m_matrices;
 };
 
 }// namespace Molviz::gfx
