@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 #include <string>
+#include <type_traits>
 
 #include "exceptions.hpp"
 
@@ -35,12 +36,32 @@ template<typename T> std::vector<T> convert_bytes(const std::vector<uint8_t> &tr
   return converted;
 }
 
-// unary functor
-struct map_byte_to_float
+template<typename T, typename P> std::vector<T> convert_bytes(const std::vector<uint8_t> &tr_data)
 {
-  float operator()(const uint8_t t_input) const
+  if (tr_data.size() % sizeof(P) != 0) {
+    throw InvalidArgumentLogged(fmt::format("vector length not divisible by {}", sizeof(P)));
+  }
+
+  std::vector<T> converted;
+
+  for (std::size_t i{ 0 }; i < tr_data.size() / sizeof(P); i += sizeof(P)) {
+    std::array<uint8_t, sizeof(T)> bytes{};
+    for (std::size_t i{ 0 }; i < sizeof(P); ++i) { bytes.at(i) = tr_data.at(i); }
+    T value;
+    std::memmove(&value, bytes.data(), sizeof(T));
+    converted.push_back(value);
+  }
+  return converted;
+}
+
+// unary functor
+template<typename T, typename P> struct map_range_to_floating_point
+{
+  P operator()(const T t_input) const
   {
-    return { static_cast<float>(t_input) / static_cast<float>(std::numeric_limits<uint8_t>::max()) };
+    if (not std::is_floating_point(P)) { throw InvalidArgumentLogged("expected floating point type"); }
+
+    return { static_cast<P>(t_input) / static_cast<P>(std::numeric_limits<T>::max()) };
   }
 };
 
