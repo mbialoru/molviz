@@ -16,7 +16,8 @@
 class debug_log_level : public Catch::EventListenerBase
 {
 public:
-  void testRunStarting(Catch::TestRunInfo const &) override { spdlog::set_level(spdlog::level::debug); }
+  using Catch::EventListenerBase::EventListenerBase;
+  void testRunStarting(Catch::TestRunInfo const &_) override { spdlog::set_level(spdlog::level::debug); }
 };
 
 // enable listener
