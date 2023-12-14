@@ -1,4 +1,5 @@
-# [Choice] bionic (18.04), focal (20.04)
+# sid(unstable), bookworm(test), bullseye(11), buster(10)
+# available in -slim variants
 ARG VARIANT="sid-slim"
 FROM debian:${VARIANT}
 
@@ -13,18 +14,31 @@ RUN echo 'root:docker' | chpasswd
 # Set fastest available mirror
 RUN apt-get update -qq && export DEBIAN_FRONTEND=noninteractive && \
     apt-get install -y --no-install-recommends netselect-apt
+
 RUN netselect-apt -c ${MIRROR} -t 15 -a amd64 -n unstable && \
     mv sources.list /etc/apt/sources.list && \
     apt-get update -qq && export DEBIAN_FRONTEND=noninteractive
 
+# Setup locale so dpkg doesn't hang on perl missing locale error building image
+# NOTE: oddly enough, warnings still appear but the image builds now just fine
+# NOTE: libc6 gets installed here instead of at gcc step, maybe thats the reason
+ENV LANGUAGE=en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
+RUN apt-get update -qq && export DEBIAN_FRONTEND=noninteractive && \
+    apt-get install -y --no-install-recommends locales
+RUN locale-gen en_US.UTF-8 && dpkg-reconfigure locales
+
 # Install necessary packages available from standard repos
-RUN apt-get install -y --no-install-recommends \
+RUN apt-get update -qq && export DEBIAN_FRONTEND=noninteractive && \
+    apt-get install -y --no-install-recommends \
         software-properties-common wget apt-utils file zip \
         openssh-client gpg-agent socat rsync make ninja-build \
         git python3 python3-pip
 
 # Install OpenGL libraries
-RUN apt-get install -y --no-install-recommends \
+RUN apt-get update -qq && export DEBIAN_FRONTEND=noninteractive && \
+    apt-get install -y --no-install-recommends \
         libgl1-mesa-dev libxext-dev libglew-dev
 
 # Install cmake-format
@@ -52,9 +66,10 @@ ENV CONAN_SYSREQUIRES_MODE enabled
 # clang-[10, 11, 12, 13]
 # Earlier versions of clang will require significant modifications to the
 # IWYU section
-ARG GCC_VER="12"
+ARG GCC_VER="13"
 # Add gcc-${GCC_VER}
-RUN apt-get install -y --no-install-recommends gcc-${GCC_VER} g++-${GCC_VER} gdb
+RUN apt-get update -qq && export DEBIAN_FRONTEND=noninteractive && \
+    apt-get install -y --no-install-recommends gcc-${GCC_VER} g++-${GCC_VER} gdb
 
 # Set gcc-${GCC_VER} as default gcc
 RUN update-alternatives --install /usr/bin/gcc gcc $(which gcc-${GCC_VER}) 100
@@ -62,10 +77,11 @@ RUN update-alternatives --install /usr/bin/g++ g++ $(which g++-${GCC_VER}) 100
 
 ARG LLVM_VER="16"
 # Add clang-${LLVM_VER}
-RUN apt-get install -y --no-install-recommends \
-    clang-${LLVM_VER} lldb-${LLVM_VER} lld-${LLVM_VER} clangd-${LLVM_VER} \
-    llvm-${LLVM_VER}-dev libclang-${LLVM_VER}-dev clang-tidy-${LLVM_VER} \
-    clang-format-${LLVM_VER} clang-tools-${LLVM_VER}
+RUN apt-get update -qq && export DEBIAN_FRONTEND=noninteractive && \
+    apt-get install -y --no-install-recommends \
+      clang-${LLVM_VER} lldb-${LLVM_VER} lld-${LLVM_VER} clangd-${LLVM_VER} \
+      llvm-${LLVM_VER}-dev libclang-${LLVM_VER}-dev clang-tidy-${LLVM_VER} \
+      clang-format-${LLVM_VER} clang-tools-${LLVM_VER}
 
 # Set the default clang-tidy, so CMake can find it
 RUN update-alternatives --install /usr/bin/clang-tidy clang-tidy $(which clang-tidy-${LLVM_VER}) 1
@@ -75,7 +91,8 @@ RUN update-alternatives --install /usr/bin/clang clang $(which clang-${LLVM_VER}
 RUN update-alternatives --install /usr/bin/clang++ clang++ $(which clang++-${LLVM_VER}) 100
 
 # Add clang-format
-RUN apt-get install -y --no-install-recommends clang-format
+RUN apt-get update -qq && export DEBIAN_FRONTEND=noninteractive && \
+    apt-get install -y --no-install-recommends clang-format
 
 # Add cmake/ccmake
 RUN apt-get update -qq && export DEBIAN_FRONTEND=noninteractive && \
@@ -84,7 +101,7 @@ RUN apt-get update -qq && export DEBIAN_FRONTEND=noninteractive && \
 # Install optional dependecies
 RUN apt-get update -qq && export DEBIAN_FRONTEND=noninteractive && \
     apt-get install -y --no-install-recommends \
-        doxygen graphviz ccache cppcheck
+      doxygen graphviz ccache cppcheck
 
 # Install include-what-you-use
 ENV IWYU /home/iwyu
@@ -120,10 +137,6 @@ ENV CXX=${USE_CLANG:+"clang++"}
 # if CC is null, set it to 'gcc' (or leave as is otherwise).
 ENV CC=${CC:-"gcc"}
 ENV CXX=${CXX:-"g++"}
-
-# Include project
-#ADD . /workspaces/cpp_starter_project
-#WORKDIR /workspaces/cpp_starter_project
 
 # Create the user
 RUN groupadd --gid $USER_GID $USERNAME \
