@@ -16,7 +16,7 @@ void ParserGLTF::parse(const std::filesystem::path &tr_file)
 {
   spdlog::debug("loading model file {}", tr_file.filename().string());
 
-  std::string json_data{ file_contents_to_string(tr_file) };
+  const std::string json_data{ file_contents_to_string(tr_file) };
 
   m_json = nlohmann::json::parse(json_data);
   m_path = tr_file;
@@ -65,35 +65,39 @@ void ParserGLTF::process_node(const std::size_t t_next_node, const glm::mat4 t_m
   glm::vec3 node_translation{ glm::vec3(0.0F, 0.0F, 0.0F) };
   if (node.find("translation") != node.end()) {
     spdlog::debug("node has translation");
-    float translation_values[3];
-    for (std::size_t i{ 0 }; i < node["translation"].size(); ++i) { translation_values[i] = (node["translation"][i]); }
-    node_translation = glm::make_vec3(translation_values);
+    std::array<float, 4> translation_values;
+    for (std::size_t i{ 0 }; i < node["translation"].size(); ++i) {
+      translation_values.at(i) = (node["translation"][i]);
+    }
+    node_translation = glm::make_vec3(translation_values.data());
   }
 
   // rotation if exists
   glm::quat node_rotation{ glm::quat(1.0F, 0.0F, 0.0F, 0.0F) };
   if (node.find("rotation") != node.end()) {
     spdlog::debug("node has rotation");
-    float rotation_values[4] = { node["rotation"][3], node["rotation"][0], node["rotation"][1], node["rotation"][2] };
-    node_rotation = glm::make_quat(rotation_values);
+    std::array<float, 4> rotation_values{
+      node["rotation"][3], node["rotation"][0], node["rotation"][1], node["rotation"][2]
+    };
+    node_rotation = glm::make_quat(rotation_values.data());
   }
 
   // scale if exists
   glm::vec3 node_scale{ glm::vec3(1.0F, 1.0F, 1.0F) };
   if (node.find("scale") != node.end()) {
     spdlog::debug("node has scaling");
-    float scale_values[3];
-    for (std::size_t i{ 0 }; i < node["scale"].size(); ++i) { scale_values[i] = (node["scale"][i]); }
-    node_scale = glm::make_vec3(scale_values);
+    std::array<float, 3> scale_values;
+    for (std::size_t i{ 0 }; i < node["scale"].size(); ++i) { scale_values.at(i) = (node["scale"][i]); }
+    node_scale = glm::make_vec3(scale_values.data());
   }
 
   // matrix if exists
   glm::mat4 node_matrix{ glm::mat4(1.0F) };
   if (node.find("matrix") != node.end()) {
     spdlog::debug("node has matrix");
-    float matrix_values[16];
-    for (std::size_t i{ 0 }; i < node["matrix"].size(); ++i) { matrix_values[i] = (node["matrix"][i]); }
-    node_matrix = glm::make_mat4(matrix_values);
+    std::array<float, 16> matrix_values;
+    for (std::size_t i{ 0 }; i < node["matrix"].size(); ++i) { matrix_values.at(i) = (node["matrix"][i]); }
+    node_matrix = glm::make_mat4(matrix_values.data());
   }
 
   glm::mat4 translation{ glm::translate(glm::mat4(1.0F), node_translation) };
@@ -132,8 +136,8 @@ void ParserGLTF::load_mesh(const std::size_t t_mesh_index)
   std::vector<uint8_t> color_bytes{ get_accessor_data(m_json["accessors"][color_access_index]) };
   std::vector<uint16_t> color_vector{ convert_bytes<uint16_t>(color_bytes) };
   std::vector<float> color_floats;
-  std::transform(color_bytes.begin(),
-    color_bytes.end(),
+  std::transform(color_vector.begin(),
+    color_vector.end(),
     std::back_inserter(color_floats),
     map_range_to_floating_point<uint16_t, float>());
   std::vector<glm::vec4> colors{ group_into_vec4<float>(color_floats) };
