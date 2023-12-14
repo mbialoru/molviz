@@ -14,7 +14,7 @@ void ParserGLTF::parse(const std::string &tr_file) { parse(std::filesystem::path
 
 void ParserGLTF::parse(const std::filesystem::path &tr_file)
 {
-  spdlog::debug("loading model file {}", m_path.filename());
+  spdlog::debug("loading model file {}", tr_file.filename().string());
 
   std::string json_data{ file_contents_to_string(tr_file) };
 
@@ -168,40 +168,40 @@ void ParserGLTF::cleanup()
 
 std::vector<uint8_t> ParserGLTF::get_accessor_data(nlohmann::json t_accessor)
 {
-  std::size_t component_type = t_accessor["componentType"];
+  ComponentType component_type = static_cast<ComponentType>(t_accessor["componentType"]);
 
   switch (component_type) {
-  case 5120:// CHAR
-    spdlog::debug(fmt::format("type is {}, int8_t", component_type));
+  case ComponentType::INT8_T:
+    spdlog::debug(fmt::format("type is {}, int8_t", static_cast<int>(component_type)));
     return h_get_accessor_data<int8_t>(t_accessor);
     break;
 
-  case 5121:// UNSIGNED CHAR
-    spdlog::debug(fmt::format("type is {}, uint8_t", component_type));
+  case ComponentType::UINT8_T:
+    spdlog::debug(fmt::format("type is {}, uint8_t", static_cast<int>(component_type)));
     return h_get_accessor_data<uint8_t>(t_accessor);
     break;
 
-  case 5122:// SHORT
-    spdlog::debug(fmt::format("type is {}, int16_t", component_type));
+  case ComponentType::INT16_T:
+    spdlog::debug(fmt::format("type is {}, int16_t", static_cast<int>(component_type)));
     return h_get_accessor_data<int16_t>(t_accessor);
     break;
 
-  case 5123:// UNSIGNED SHORT
-    spdlog::debug(fmt::format("type is {}, uint16_t", component_type));
+  case ComponentType::UINT16_T:
+    spdlog::debug(fmt::format("type is {}, uint16_t", static_cast<int>(component_type)));
     return h_get_accessor_data<uint16_t>(t_accessor);
     break;
 
-  case 5125:// UNSIGNED INT
-    spdlog::debug(fmt::format("type is {}, uint32_t", component_type));
+  case ComponentType::UINT32_T:
+    spdlog::debug(fmt::format("type is {}, uint32_t", static_cast<int>(component_type)));
     return h_get_accessor_data<uint32_t>(t_accessor);
     break;
 
-  case 5126:
-    spdlog::debug(fmt::format("type is {}, float_t", component_type));
+  case ComponentType::FLOAT_T:
+    spdlog::debug(fmt::format("type is {}, float_t", static_cast<int>(component_type)));
     return h_get_accessor_data<float_t>(t_accessor);
     break;
 
   default:
-    throw RuntimeErrorLogged(fmt::format("unknown component type {}", component_type));
+    throw RuntimeErrorLogged(fmt::format("unknown component type {}", static_cast<int>(component_type)));
   }
 }

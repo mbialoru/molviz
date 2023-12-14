@@ -9,6 +9,8 @@
 
 namespace Molviz::gfx {
 
+enum ComponentType { INT8_T = 5120, UINT8_T = 5121, INT16_T = 5122, UINT16_T = 5123, UINT32_T = 5125, FLOAT_T = 5126 };
+
 class ParserGLTF
 {
 public:
@@ -80,9 +82,8 @@ private:
       return sizeof(glm::vec<3, T, glm::qualifier::defaultp>) / sizeof(T);
     else if (t_type == "VEC4")
       return sizeof(glm::vec<4, T, glm::qualifier::defaultp>) / sizeof(T);
-    else {
+    else
       throw InvalidArgumentLogged(fmt::format("type is invalid {} given", t_type));
-    }
   }
 
   template<typename T> std::vector<uint8_t> h_get_accessor_data(nlohmann::json t_accessor)
@@ -103,8 +104,12 @@ private:
     std::size_t data_size = count * sizeof(T) * get_vertex_stride<T>(type);
 
     for (std::size_t i{ data_begin }; i < data_begin + data_size; i += sizeof(T)) {
-      for (std::size_t i{ 0 }; i < sizeof(T); ++i) { data.push_back(m_data[i]); }
+      for (std::size_t j{ 0 }; j < sizeof(T); ++i) { data.push_back(m_data[j]); }
     }
+
+    spdlog::debug(fmt::format("loaded {} bytes from accessor", data.size()));
+
+    return data;
   }
 
   std::vector<uint8_t> get_accessor_data(nlohmann::json t_accessor);

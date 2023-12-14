@@ -5,7 +5,7 @@
 
 #include "gfx/elementbuffer.hpp"
 #include "gfx/mesh.hpp"
-#include "gfx/model.hpp"
+#include "gfx/parsergltf.hpp"
 #include "gfx/shader.hpp"
 #include "gfx/vertexarray.hpp"
 #include "gfx/vertexbuffer.hpp"
@@ -141,15 +141,17 @@ TEST_CASE("Mesh valid creation and cleanup", "[Mesh]")
   auto [p_window, context]{ create_dummy_opengl_context() };
 
   REQUIRE_NOTHROW(Mesh(vertices, indices));
+
+  cleanup_dummy_opengl_context(p_window, context);
 }
 
-TEST_CASE("Model valid creation and cleanup", "[Model]")
+TEST_CASE("GLTF files valid parsing", "[ParserGLTF, GLTF]")
 {
   using namespace Molviz::gfx;
 
   auto [p_window, context]{ create_dummy_opengl_context() };
 
-  REQUIRE_NOTHROW(Model("/workspaces/molviz/test/resources/meshes/cube_color/cube_color.gltf"));
+  REQUIRE_NOTHROW(ParserGLTF("/workspaces/molviz/test/resources/meshes/cube_color/cube_color.gltf"));
 
   cleanup_dummy_opengl_context(p_window, context);
 }

@@ -13,7 +13,7 @@ class VertexArray
 {
 public:
   explicit VertexArray();
-  ~VertexArray() = default;
+  ~VertexArray();
 
   void bind();
   void unbind();
