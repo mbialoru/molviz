@@ -4,6 +4,8 @@ using namespace Molviz::gfx;
 
 VertexArray::VertexArray() { glGenVertexArrays(1, &id); };
 
+VertexArray::~VertexArray() { cleanup(); }
+
 void VertexArray::bind() { glBindVertexArray(id); }
 
 void VertexArray::unbind() { glBindVertexArray(0); }

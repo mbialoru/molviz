@@ -28,7 +28,7 @@ template<typename T> std::vector<T> convert_bytes(const std::vector<uint8_t> &tr
 
   for (std::size_t i{ 0 }; i < tr_data.size() / sizeof(T); i += sizeof(T)) {
     std::array<uint8_t, sizeof(T)> bytes;
-    for (std::size_t i{ 0 }; i < sizeof(T); ++i) { bytes[i] = tr_data[i]; }
+    for (std::size_t j{ 0 }; j < sizeof(T); ++j) { bytes[i] = tr_data[j]; }
     T value;
     std::memmove(&value, bytes.data(), sizeof(T));
     converted.push_back(value);
@@ -46,7 +46,7 @@ template<typename T, typename P> std::vector<T> convert_bytes(const std::vector<
 
   for (std::size_t i{ 0 }; i < tr_data.size() / sizeof(P); i += sizeof(P)) {
     std::array<uint8_t, sizeof(T)> bytes{};
-    for (std::size_t i{ 0 }; i < sizeof(P); ++i) { bytes.at(i) = tr_data.at(i); }
+    for (std::size_t j{ 0 }; j < sizeof(P); ++j) { bytes.at(i) = tr_data.at(j); }
     T value;
     std::memmove(&value, bytes.data(), sizeof(T));
     converted.push_back(value);
@@ -59,7 +59,7 @@ template<typename T, typename P> struct map_range_to_floating_point
 {
   P operator()(const T t_input) const
   {
-    if (not std::is_floating_point(P)) { throw InvalidArgumentLogged("expected floating point type"); }
+    if (not std::is_floating_point<P>::value) { throw InvalidArgumentLogged("expected floating point type"); }
 
     return { static_cast<P>(t_input) / static_cast<P>(std::numeric_limits<T>::max()) };
   }
