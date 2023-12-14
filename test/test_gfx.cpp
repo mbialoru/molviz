@@ -1,6 +1,8 @@
 #include <GL/glew.h>
 #include <SDL.h>
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/reporters/catch_reporter_event_listener.hpp>
+#include <catch2/reporters/catch_reporter_registrars.hpp>
 #include <spdlog/spdlog.h>
 
 #include "gfx/elementbuffer.hpp"
@@ -10,7 +12,17 @@
 #include "gfx/vertexarray.hpp"
 #include "gfx/vertexbuffer.hpp"
 
-// utilities
+// set log level to debug for all tests cases
+class debug_log_level : public Catch::EventListenerBase
+{
+public:
+  void testRunStarting(Catch::TestRunInfo const &) override { spdlog::set_level(spdlog::level::debug); }
+};
+
+// enable listener
+CATCH_REGISTER_LISTENER(debug_log_level)
+
+// utility functions
 std::pair<SDL_Window *, SDL_GLContext> create_dummy_opengl_context()
 {
   // init SDL
@@ -152,6 +164,19 @@ TEST_CASE("GLTF files valid parsing", "[ParserGLTF, GLTF]")
   auto [p_window, context]{ create_dummy_opengl_context() };
 
   REQUIRE_NOTHROW(ParserGLTF("/workspaces/molviz/test/resources/meshes/cube_color/cube_color.gltf"));
+
+  cleanup_dummy_opengl_context(p_window, context);
+}
+
+TEST_CASE("Building valid Model object from GLTF files", "[Model, ParserGLTF, GLTF]")
+{
+  using namespace Molviz::gfx;
+
+  auto [p_window, context]{ create_dummy_opengl_context() };
+
+  auto parser{ ParserGLTF("/workspaces/molviz/test/resources/meshes/cube_color/cube_color.gltf") };
+
+  REQUIRE_NOTHROW(parser.get_model());
 
   cleanup_dummy_opengl_context(p_window, context);
 }
