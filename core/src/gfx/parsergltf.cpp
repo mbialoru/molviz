@@ -26,7 +26,7 @@ void ParserGLTF::parse(const std::filesystem::path &tr_file)
   process_node(0);
 }
 
-Model ParserGLTF::get_model() { return Model(m_meshes, m_translations, m_scales, m_rotations, m_matrices); }
+Model ParserGLTF::get_model() { return { m_meshes, m_translations, m_scales, m_rotations, m_matrices }; }
 
 std::vector<uint8_t> ParserGLTF::load_bin_file()
 {
@@ -45,7 +45,7 @@ std::vector<Vertex> ParserGLTF::assemble_vertices(std::vector<glm::vec3> t_posit
   std::vector<Vertex> vertices;
 
   for (std::size_t i{ 0 }; i < t_positions.size(); ++i) {
-    vertices.emplace_back(t_positions[i], t_normals[i], glm::vec3(1.0F, 1.0F, 1.0F));
+    vertices.emplace_back(t_positions[i], t_normals[i], glm::vec3(t_colors[i].r, t_colors[i].g, t_colors[i].b));
   }
 
   spdlog::debug("loaded {} vertices", vertices.size());

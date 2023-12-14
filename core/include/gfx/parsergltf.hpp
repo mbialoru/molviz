@@ -104,7 +104,7 @@ private:
     std::size_t data_size = count * sizeof(T) * get_vertex_stride<T>(type);
 
     for (std::size_t i{ data_begin }; i < data_begin + data_size; i += sizeof(T)) {
-      for (std::size_t j{ 0 }; j < sizeof(T); ++i) { data.push_back(m_data[j]); }
+      for (std::size_t j{ 0 }; j < sizeof(T); ++j) { data.push_back(m_data[j]); }
     }
 
     spdlog::debug(fmt::format("loaded {} bytes from accessor", data.size()));

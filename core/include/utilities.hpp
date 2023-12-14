@@ -28,7 +28,7 @@ template<typename T> std::vector<T> convert_bytes(const std::vector<uint8_t> &tr
 
   for (std::size_t i{ 0 }; i < tr_data.size() / sizeof(T); i += sizeof(T)) {
     std::array<uint8_t, sizeof(T)> bytes;
-    for (std::size_t j{ 0 }; j < sizeof(T); ++j) { bytes[i] = tr_data[j]; }
+    for (std::size_t j{ i }; j < sizeof(T); ++j) { bytes[j] = tr_data[j]; }
     T value;
     std::memmove(&value, bytes.data(), sizeof(T));
     converted.push_back(value);
@@ -46,7 +46,7 @@ template<typename T, typename P> std::vector<T> convert_bytes(const std::vector<
 
   for (std::size_t i{ 0 }; i < tr_data.size() / sizeof(P); i += sizeof(P)) {
     std::array<uint8_t, sizeof(T)> bytes{};
-    for (std::size_t j{ 0 }; j < sizeof(P); ++j) { bytes.at(i) = tr_data.at(j); }
+    for (std::size_t j{ i }; j < sizeof(P); ++j) { bytes.at(j) = tr_data.at(j); }
     T value;
     std::memmove(&value, bytes.data(), sizeof(T));
     converted.push_back(value);
