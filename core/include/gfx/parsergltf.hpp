@@ -46,7 +46,7 @@ private:
     for (std::size_t i{ 0 }; i < tr_data.size() / 2; i += 2) { grouped.emplace_back(tr_data[i + 0], tr_data[i + 1]); }
 
     return grouped;
-  };
+  }
 
   template<typename T> std::vector<glm::vec<3, T, glm::defaultp>> group_into_vec3(const std::vector<T> &tr_data)
   {
@@ -58,7 +58,7 @@ private:
       grouped.emplace_back(tr_data[i + 0], tr_data[i + 1], tr_data[i + 2]);
     }
     return grouped;
-  };
+  }
 
   template<typename T> std::vector<glm::vec<4, T, glm::defaultp>> group_into_vec4(const std::vector<T> &tr_data)
   {
@@ -70,7 +70,7 @@ private:
       grouped.emplace_back(tr_data[i + 0], tr_data[i + 1], tr_data[i + 2], tr_data[i + 3]);
     }
     return grouped;
-  };
+  }
 
   template<typename T> std::size_t get_vertex_stride(const std::string t_type)
   {
@@ -104,7 +104,7 @@ private:
     std::size_t data_size = count * sizeof(T) * get_vertex_stride<T>(type);
 
     for (std::size_t i{ data_begin }; i < data_begin + data_size; i += sizeof(T)) {
-      for (std::size_t j{ 0 }; j < sizeof(T); ++j) { data.push_back(m_data[j]); }
+      for (std::size_t j{ 0 }; j < sizeof(T); ++j) { data.push_back(m_data[i + j]); }
     }
 
     spdlog::debug(fmt::format("loaded {} bytes from accessor", data.size()));
@@ -116,7 +116,7 @@ private:
 
   std::vector<uint8_t> m_data;
 
-  std::filesystem::path m_path;
+  std::filesystem::path m_file;
 
   nlohmann::json m_json;
 

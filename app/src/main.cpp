@@ -11,13 +11,14 @@
 #include <imgui_impl_sdl2.h>
 #include <spdlog/spdlog.h>
 
-#include "gfx/model.hpp"
+#include "gfx/parsergltf.hpp"
 
 using Molviz::gfx::Vertex;
 using Molviz::gfx::Shader;
 using Molviz::gfx::Mesh;
 using Molviz::gfx::Model;
 using Molviz::gfx::Camera;
+using Molviz::gfx::ParserGLTF;
 
 // main code
 int main(int argc, char **argv)
@@ -134,8 +135,9 @@ int main(int argc, char **argv)
   Camera camera(static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y), glm::vec3(0.0F, 0.0F, 0.0F));
 
   // create models
-  std::filesystem::path model_gltf_file{ "../resources/meshes/sphere/sphere.gltf" };
-  Model model(std::filesystem::absolute(model_gltf_file).c_str());
+  std::filesystem::path model_gltf_file{ "../resources/meshes/cube_color/cube_color.gltf" };
+  ParserGLTF parser{ std::filesystem::absolute(model_gltf_file) };
+  Model model{ parser.get_model() };
 
   uint32_t last_frametime{ 0 };
   uint32_t this_frametime{ 0 };
