@@ -15,8 +15,7 @@ std::string Molviz::gfx::shader_type_to_string(const ShaderType t_type)
     return { "VERTEX" };
     break;
   default:
-    spdlog::error("invalid shader type {} given", static_cast<int>(t_type));
-    throw std::invalid_argument("invalid shader type");
+    throw InvalidArgumentLogged(fmt::format("invalid shader type {}", static_cast<int>(t_type)));
     break;
   }
 }

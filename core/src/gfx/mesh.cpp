@@ -2,23 +2,23 @@
 
 using namespace Molviz::gfx;
 
-Mesh::Mesh(std::vector<Vertex> &tr_vertices, std::vector<GLuint> &tr_indices)
-  : vertices(tr_vertices), indices(tr_indices), p_vertex_array(std::make_shared<VertexArray>(VertexArray()))
+Mesh::Mesh(const std::vector<Vertex> &tr_vertices, const std::vector<GLuint> &tr_indices)
+  : m_vertices(tr_vertices), m_indices(tr_indices), mp_vertex_array(std::make_shared<VertexArray>())
 {
-  p_vertex_array->bind();
+  mp_vertex_array->bind();
 
-  p_vertex_buffer = std::make_shared<VertexBuffer>(VertexBuffer(vertices));
-  p_element_buffer = std::make_shared<ElementBuffer>(ElementBuffer(indices));
+  mp_vertex_buffer = std::make_shared<VertexBuffer>(m_vertices);
+  mp_element_buffer = std::make_shared<ElementBuffer>(m_indices);
 
-  p_vertex_array->link_attribute(*p_vertex_buffer, 0, 3, GL_FLOAT, sizeof(Vertex), reinterpret_cast<void *>(0));
-  p_vertex_array->link_attribute(
-    *p_vertex_buffer, 1, 3, GL_FLOAT, sizeof(Vertex), reinterpret_cast<void *>(3 * sizeof(float)));
-  p_vertex_array->link_attribute(
-    *p_vertex_buffer, 2, 3, GL_FLOAT, sizeof(Vertex), reinterpret_cast<void *>(6 * sizeof(float)));
+  mp_vertex_array->link_attribute(*mp_vertex_buffer, 0, 3, GL_FLOAT, sizeof(Vertex), reinterpret_cast<void *>(0));
+  mp_vertex_array->link_attribute(
+    *mp_vertex_buffer, 1, 3, GL_FLOAT, sizeof(Vertex), reinterpret_cast<void *>(3 * sizeof(float)));
+  mp_vertex_array->link_attribute(
+    *mp_vertex_buffer, 2, 3, GL_FLOAT, sizeof(Vertex), reinterpret_cast<void *>(6 * sizeof(float)));
 
-  p_vertex_array->unbind();
-  p_vertex_buffer->unbind();
-  p_element_buffer->unbind();
+  mp_vertex_array->unbind();
+  mp_vertex_buffer->unbind();
+  mp_element_buffer->unbind();
 };
 
 void Mesh::draw(Shader &tr_shader,
@@ -29,7 +29,7 @@ void Mesh::draw(Shader &tr_shader,
   glm::vec3 t_scale) const
 {
   tr_shader.activate();
-  p_vertex_array->bind();
+  mp_vertex_array->bind();
 
   // handle camera matrix
   glUniform3f(glGetUniformLocation(tr_shader.id, "u_camera_position"),
@@ -54,7 +54,7 @@ void Mesh::draw(Shader &tr_shader,
   glUniformMatrix4fv(glGetUniformLocation(tr_shader.id, "u_model_matrix"), 1, GL_FALSE, glm::value_ptr(t_matrix));
 
   // draw mesh
-  glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0);
+  glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()), GL_UNSIGNED_INT, 0);
 
-  p_vertex_array->unbind();
+  mp_vertex_array->unbind();
 }

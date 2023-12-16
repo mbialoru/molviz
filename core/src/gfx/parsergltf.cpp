@@ -2,11 +2,44 @@
 
 using namespace Molviz::gfx;
 
+std::string Molviz::gfx::component_type_to_string(const ComponentType t_type)
+{
+  switch (t_type) {
+  case ComponentType::INT8_T:
+    return { "INT8_T" };
+    break;
+
+  case ComponentType::UINT8_T:
+    return { "UINT8_T" };
+    break;
+
+  case ComponentType::INT16_T:
+    return { "INT16_T" };
+    break;
+
+  case ComponentType::UINT16_T:
+    return { "UINT16_T" };
+    break;
+
+  case ComponentType::UINT32_T:
+    return { "UINT32_T" };
+    break;
+
+  case ComponentType::FLOAT_T:
+    return { "FLOAT_T" };
+    break;
+
+  default:
+    throw InvalidArgumentLogged(fmt::format("invalid component type {}", static_cast<int>(t_type)));
+    break;
+  }
+}
+
 ParserGLTF::ParserGLTF(const char *tp_file) : ParserGLTF(std::filesystem::path(std::string(tp_file))){};
 
 ParserGLTF::ParserGLTF(const std::string &tr_file) : ParserGLTF(std::filesystem::path(tr_file)){};
 
-ParserGLTF::ParserGLTF(const std::filesystem::path &tr_file) : m_file(tr_file) { parse(m_file); };
+ParserGLTF::ParserGLTF(const std::filesystem::path t_file) : m_file(std::move(t_file)) { parse(m_file); };
 
 void ParserGLTF::parse(const char *tp_file) { parse(std::filesystem::path(std::string(tp_file))); }
 
@@ -167,7 +200,7 @@ void ParserGLTF::load_mesh(const std::size_t t_mesh_index)
   std::vector<uint16_t> indice_vector{ convert_bytes<uint16_t>(indice_bytes) };
   std::vector<GLuint> indices{ indice_vector.begin(), indice_vector.end() };
 
-  m_meshes.push_back(Mesh(vertices, indices));
+  m_meshes.emplace_back(vertices, indices);
 
   spdlog::debug("loaded mesh {}", t_mesh_index);
 }
@@ -185,35 +218,30 @@ void ParserGLTF::cleanup()
 std::vector<uint8_t> ParserGLTF::get_accessor_data(nlohmann::json t_accessor)
 {
   ComponentType component_type = static_cast<ComponentType>(t_accessor["componentType"]);
-
+  spdlog::debug(
+    fmt::format("type is {}, {}", static_cast<int>(component_type), component_type_to_string(component_type)));
   switch (component_type) {
   case ComponentType::INT8_T:
-    spdlog::debug(fmt::format("type is {}, int8_t", static_cast<int>(component_type)));
     return h_get_accessor_data<int8_t>(t_accessor);
     break;
 
   case ComponentType::UINT8_T:
-    spdlog::debug(fmt::format("type is {}, uint8_t", static_cast<int>(component_type)));
     return h_get_accessor_data<uint8_t>(t_accessor);
     break;
 
   case ComponentType::INT16_T:
-    spdlog::debug(fmt::format("type is {}, int16_t", static_cast<int>(component_type)));
     return h_get_accessor_data<int16_t>(t_accessor);
     break;
 
   case ComponentType::UINT16_T:
-    spdlog::debug(fmt::format("type is {}, uint16_t", static_cast<int>(component_type)));
     return h_get_accessor_data<uint16_t>(t_accessor);
     break;
 
   case ComponentType::UINT32_T:
-    spdlog::debug(fmt::format("type is {}, uint32_t", static_cast<int>(component_type)));
     return h_get_accessor_data<uint32_t>(t_accessor);
     break;
 
   case ComponentType::FLOAT_T:
-    spdlog::debug(fmt::format("type is {}, float_t", static_cast<int>(component_type)));
     return h_get_accessor_data<float_t>(t_accessor);
     break;
 
