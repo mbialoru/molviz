@@ -11,13 +11,14 @@ namespace Molviz::gfx {
 
 enum ComponentType { INT8_T = 5120, UINT8_T = 5121, INT16_T = 5122, UINT16_T = 5123, UINT32_T = 5125, FLOAT_T = 5126 };
 
+std::string component_type_to_string(const ComponentType t_type);
+
 class ParserGLTF
 {
 public:
-  ParserGLTF();
   ParserGLTF(const char *tp_file);
   ParserGLTF(const std::string &tr_file);
-  ParserGLTF(const std::filesystem::path &tr_file);
+  ParserGLTF(const std::filesystem::path t_file);
   ~ParserGLTF() = default;
 
   void parse(const char *tp_file);

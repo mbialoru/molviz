@@ -12,15 +12,10 @@
 
 namespace Molviz::gfx {
 
-// NOTE: using shared_ptr may have unforeseen consequences when copying
-// TODO: in case above is true - implement explicit copy constructor and
-// rollback to using unique_ptr. This also would call for removal of destructors
-// in VAO, EBO and VAO classes !
-
 class Mesh
 {
 public:
-  Mesh(std::vector<Vertex> &tr_vertices, std::vector<GLuint> &tr_indices);
+  Mesh(const std::vector<Vertex> &tr_vertices, const std::vector<GLuint> &tr_indices);
   ~Mesh() = default;
 
   void draw(Shader &tr_shader,
@@ -30,12 +25,13 @@ public:
     glm::quat t_rotation = glm::quat(1.0F, 0.0F, 0.0F, 0.0F),
     glm::vec3 t_scale = glm::vec3(1.0F, 1.0F, 1.0F)) const;
 
-  std::vector<Vertex> vertices;
-  std::vector<GLuint> indices;
+private:
+  std::vector<Vertex> m_vertices;
+  std::vector<GLuint> m_indices;
 
-  std::shared_ptr<VertexArray> p_vertex_array;
-  std::shared_ptr<VertexBuffer> p_vertex_buffer;
-  std::shared_ptr<ElementBuffer> p_element_buffer;
+  std::shared_ptr<VertexArray> mp_vertex_array;
+  std::shared_ptr<VertexBuffer> mp_vertex_buffer;
+  std::shared_ptr<ElementBuffer> mp_element_buffer;
 };
 
 }// namespace Molviz::gfx
