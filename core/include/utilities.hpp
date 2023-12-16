@@ -26,27 +26,9 @@ template<typename T> std::vector<T> convert_bytes(const std::vector<uint8_t> &tr
 
   std::vector<T> converted;
 
-  for (std::size_t i{ 0 }; i < tr_data.size() / sizeof(T); i += sizeof(T)) {
+  for (std::size_t i{ 0 }; i < tr_data.size(); i += sizeof(T)) {
     std::array<uint8_t, sizeof(T)> bytes;
-    for (std::size_t j{ i }; j < sizeof(T); ++j) { bytes[j] = tr_data[j]; }
-    T value;
-    std::memmove(&value, bytes.data(), sizeof(T));
-    converted.push_back(value);
-  }
-  return converted;
-}
-
-template<typename T, typename P> std::vector<T> convert_bytes(const std::vector<uint8_t> &tr_data)
-{
-  if (tr_data.size() % sizeof(P) != 0) {
-    throw InvalidArgumentLogged(fmt::format("vector length not divisible by {}", sizeof(P)));
-  }
-
-  std::vector<T> converted;
-
-  for (std::size_t i{ 0 }; i < tr_data.size() / sizeof(P); i += sizeof(P)) {
-    std::array<uint8_t, sizeof(T)> bytes{};
-    for (std::size_t j{ i }; j < sizeof(P); ++j) { bytes.at(j) = tr_data.at(j); }
+    for (std::size_t j{ 0 }; j < sizeof(T); ++j) { bytes.at(j) = tr_data.at(i + j); }
     T value;
     std::memmove(&value, bytes.data(), sizeof(T));
     converted.push_back(value);
@@ -55,7 +37,7 @@ template<typename T, typename P> std::vector<T> convert_bytes(const std::vector<
 }
 
 // unary functor
-template<typename T, typename P> struct map_range_to_floating_point
+template<typename T, typename P> struct map_to_float_range
 {
   P operator()(const T t_input) const
   {

@@ -6,7 +6,7 @@ ParserGLTF::ParserGLTF(const char *tp_file) : ParserGLTF(std::filesystem::path(s
 
 ParserGLTF::ParserGLTF(const std::string &tr_file) : ParserGLTF(std::filesystem::path(tr_file)){};
 
-ParserGLTF::ParserGLTF(const std::filesystem::path &tr_path) : m_path(tr_path) { parse(m_path); };
+ParserGLTF::ParserGLTF(const std::filesystem::path &tr_file) : m_file(tr_file) { parse(m_file); };
 
 void ParserGLTF::parse(const char *tp_file) { parse(std::filesystem::path(std::string(tp_file))); }
 
@@ -19,7 +19,7 @@ void ParserGLTF::parse(const std::filesystem::path &tr_file)
   const std::string json_data{ file_contents_to_string(tr_file) };
 
   m_json = nlohmann::json::parse(json_data);
-  m_path = tr_file;
+  m_file = tr_file;
   m_data = load_bin_file();
 
   cleanup();
@@ -31,7 +31,7 @@ Model ParserGLTF::get_model() { return { m_meshes, m_translations, m_scales, m_r
 std::vector<uint8_t> ParserGLTF::load_bin_file()
 {
   std::string uri = m_json["buffers"][0]["uri"];
-  std::filesystem::path parent{ m_path.parent_path() };
+  std::filesystem::path parent{ m_file.parent_path() };
   std::string bytes_text{ file_contents_to_string(parent / uri) };
   std::vector<uint8_t> data{ bytes_text.begin(), bytes_text.end() };
 
@@ -44,8 +44,17 @@ std::vector<Vertex> ParserGLTF::assemble_vertices(std::vector<glm::vec3> t_posit
 {
   std::vector<Vertex> vertices;
 
+  // check for vector size equality
+  if (not(t_positions.size() == t_normals.size() and t_positions.size() == t_colors.size())) {
+    spdlog::debug(fmt::format("positions {}", t_positions.size()));
+    spdlog::debug(fmt::format("normals {}", t_normals.size()));
+    spdlog::debug(fmt::format("colors {}", t_colors.size()));
+    throw InvalidArgumentLogged(fmt::format("vertex vector sizes do not match"));
+  }
+
   for (std::size_t i{ 0 }; i < t_positions.size(); ++i) {
-    vertices.emplace_back(t_positions[i], t_normals[i], glm::vec3(t_colors[i].r, t_colors[i].g, t_colors[i].b));
+    vertices.emplace_back(
+      t_positions.at(i), t_normals.at(i), glm::vec3(t_colors.at(i).r, t_colors.at(i).g, t_colors.at(i).b));
   }
 
   spdlog::debug("loaded {} vertices", vertices.size());
@@ -62,10 +71,10 @@ void ParserGLTF::process_node(const std::size_t t_next_node, const glm::mat4 t_m
   spdlog::debug("processing node {}", t_next_node);
 
   // translation if exists
-  glm::vec3 node_translation{ glm::vec3(0.0F, 0.0F, 0.0F) };
+  glm::vec3 node_translation{ 0.0F, 0.0F, 0.0F };
   if (node.find("translation") != node.end()) {
     spdlog::debug("node has translation");
-    std::array<float, 4> translation_values;
+    std::array<float, 4> translation_values{ 0.0F };
     for (std::size_t i{ 0 }; i < node["translation"].size(); ++i) {
       translation_values.at(i) = (node["translation"][i]);
     }
@@ -83,16 +92,16 @@ void ParserGLTF::process_node(const std::size_t t_next_node, const glm::mat4 t_m
   }
 
   // scale if exists
-  glm::vec3 node_scale{ glm::vec3(1.0F, 1.0F, 1.0F) };
+  glm::vec3 node_scale{ 1.0F, 1.0F, 1.0F };
   if (node.find("scale") != node.end()) {
     spdlog::debug("node has scaling");
-    std::array<float, 3> scale_values;
+    std::array<float, 3> scale_values{ 1.0F };
     for (std::size_t i{ 0 }; i < node["scale"].size(); ++i) { scale_values.at(i) = (node["scale"][i]); }
     node_scale = glm::make_vec3(scale_values.data());
   }
 
   // matrix if exists
-  glm::mat4 node_matrix{ glm::mat4(1.0F) };
+  glm::mat4 node_matrix{ 1.0F };
   if (node.find("matrix") != node.end()) {
     spdlog::debug("node has matrix");
     std::array<float, 16> matrix_values;
@@ -136,11 +145,13 @@ void ParserGLTF::load_mesh(const std::size_t t_mesh_index)
   std::vector<uint8_t> color_bytes{ get_accessor_data(m_json["accessors"][color_access_index]) };
   std::vector<uint16_t> color_vector{ convert_bytes<uint16_t>(color_bytes) };
   std::vector<float> color_floats;
-  std::transform(color_vector.begin(),
-    color_vector.end(),
-    std::back_inserter(color_floats),
-    map_range_to_floating_point<uint16_t, float>());
+  std::transform(
+    color_vector.begin(), color_vector.end(), std::back_inserter(color_floats), map_to_float_range<uint16_t, float>());
   std::vector<glm::vec4> colors{ group_into_vec4<float>(color_floats) };
+
+  // TODO: REMOVE THIS
+  colors.emplace_back(1.0F, 1.0F, 1.0F, 1.0F);
+  colors.emplace_back(1.0F, 1.0F, 1.0F, 1.0F);
 
   std::vector<uint8_t> position_bytes{ get_accessor_data(m_json["accessors"][position_access_index]) };
   std::vector<float> position_vector{ convert_bytes<float>(position_bytes) };
@@ -153,7 +164,8 @@ void ParserGLTF::load_mesh(const std::size_t t_mesh_index)
   std::vector<Vertex> vertices{ assemble_vertices(positions, normals, colors) };
 
   std::vector<uint8_t> indice_bytes{ get_accessor_data(m_json["accessors"][index_access_index]) };
-  std::vector<GLuint> indices{ convert_bytes<GLuint, uint16_t>(indice_bytes) };
+  std::vector<uint16_t> indice_vector{ convert_bytes<uint16_t>(indice_bytes) };
+  std::vector<GLuint> indices{ indice_vector.begin(), indice_vector.end() };
 
   m_meshes.push_back(Mesh(vertices, indices));
 

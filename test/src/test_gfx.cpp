@@ -1,9 +1,7 @@
-#include <GL/glew.h>
-#include <SDL.h>
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/reporters/catch_reporter_event_listener.hpp>
-#include <catch2/reporters/catch_reporter_registrars.hpp>
-#include <spdlog/spdlog.h>
+
+#include "test_gfx_utilities.hpp"
+#include "test_utilities.hpp"
 
 #include "gfx/elementbuffer.hpp"
 #include "gfx/mesh.hpp"
@@ -12,48 +10,7 @@
 #include "gfx/vertexarray.hpp"
 #include "gfx/vertexbuffer.hpp"
 
-// set log level to debug for all tests cases
-class debug_log_level : public Catch::EventListenerBase
-{
-public:
-  using Catch::EventListenerBase::EventListenerBase;
-  void testRunStarting(Catch::TestRunInfo const &_) override { spdlog::set_level(spdlog::level::debug); }
-};
-
-// enable listener
 CATCH_REGISTER_LISTENER(debug_log_level)
-
-// utility functions
-std::pair<SDL_Window *, SDL_GLContext> create_dummy_opengl_context()
-{
-  // init SDL
-  if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-    spdlog::error("SDL initialization error: {}", SDL_GetError());
-    FAIL();
-  }
-
-  // create dummy hidden SDL window for a dummy OpenGL context
-  SDL_WindowFlags window_flags{ static_cast<SDL_WindowFlags>(SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN) };
-  SDL_Window *p_window{ SDL_CreateWindow(nullptr, 0, 0, 0, 0, window_flags) };
-  SDL_GLContext context{ SDL_GL_CreateContext(p_window) };
-
-  // init GLEW after OpenGL context - Missing GL version error otherwise
-  GLenum status{ glewInit() };
-  if (status != GLEW_OK) {
-    std::string error_message{ reinterpret_cast<const char *>(glewGetErrorString(status)) };
-    spdlog::error("GLEW init failed! error: {}", error_message);
-    FAIL();
-  }
-
-  return { p_window, context };
-}
-
-void cleanup_dummy_opengl_context(SDL_Window *tp_window, SDL_GLContext t_context)
-{
-  SDL_GL_DeleteContext(t_context);
-  SDL_DestroyWindow(tp_window);
-  SDL_Quit();
-}
 
 // test cases
 TEST_CASE("ElementBuffer valid creation and cleanup", "[ElementBuffer, EBO]")
@@ -73,7 +30,7 @@ TEST_CASE("ElementBuffer valid creation and cleanup", "[ElementBuffer, EBO]")
 
   REQUIRE_FALSE(glIsBuffer(element_buffer.id));
 
-  cleanup_dummy_opengl_context(p_window, context);
+  cleanup_opengl_context(p_window, context);
 }
 
 TEST_CASE("VertexBuffer valud creation and cleanup", "[VertexBuffer, VBO]")
@@ -92,7 +49,7 @@ TEST_CASE("VertexBuffer valud creation and cleanup", "[VertexBuffer, VBO]")
 
   REQUIRE_FALSE(glIsBuffer(vertex_buffer.id));
 
-  cleanup_dummy_opengl_context(p_window, context);
+  cleanup_opengl_context(p_window, context);
 }
 
 TEST_CASE("VertexArray valid creation and cleanup", "[VertexArray, VAO]")
@@ -111,10 +68,10 @@ TEST_CASE("VertexArray valid creation and cleanup", "[VertexArray, VAO]")
 
   REQUIRE_FALSE(glIsVertexArray(vertex_array.id));
 
-  cleanup_dummy_opengl_context(p_window, context);
+  cleanup_opengl_context(p_window, context);
 }
 
-TEST_CASE("Shader valid creation and cleanup", "[Shader]")
+TEST_CASE("Empty Shader valid creation and cleanup", "[Shader]")
 {
   using namespace Molviz::gfx;
 
@@ -131,7 +88,27 @@ TEST_CASE("Shader valid creation and cleanup", "[Shader]")
 
   REQUIRE_FALSE(glIsProgram(shader.id));
 
-  cleanup_dummy_opengl_context(p_window, context);
+  cleanup_opengl_context(p_window, context);
+}
+
+TEST_CASE("Default Shader valid creation and cleanup", "[Shader]")
+{
+  using namespace Molviz::gfx;
+
+  std::filesystem::path vertex_shader{ "/workspaces/molviz/app/resources/shaders/default.vert" };
+  std::filesystem::path fragment_shader{ "/workspaces/molviz/app/resources/shaders/default.frag" };
+
+  auto [p_window, context]{ create_dummy_opengl_context() };
+
+  Shader shader{ vertex_shader, fragment_shader };
+
+  REQUIRE(glIsProgram(shader.id));
+
+  shader.cleanup();
+
+  REQUIRE_FALSE(glIsProgram(shader.id));
+
+  cleanup_opengl_context(p_window, context);
 }
 
 TEST_CASE("Mesh valid creation and cleanup", "[Mesh]")
@@ -155,7 +132,7 @@ TEST_CASE("Mesh valid creation and cleanup", "[Mesh]")
 
   REQUIRE_NOTHROW(Mesh(vertices, indices));
 
-  cleanup_dummy_opengl_context(p_window, context);
+  cleanup_opengl_context(p_window, context);
 }
 
 TEST_CASE("GLTF files valid parsing", "[ParserGLTF, GLTF]")
@@ -166,7 +143,7 @@ TEST_CASE("GLTF files valid parsing", "[ParserGLTF, GLTF]")
 
   REQUIRE_NOTHROW(ParserGLTF("/workspaces/molviz/test/resources/meshes/cube_color/cube_color.gltf"));
 
-  cleanup_dummy_opengl_context(p_window, context);
+  cleanup_opengl_context(p_window, context);
 }
 
 TEST_CASE("Building valid Model object from GLTF files", "[Model, ParserGLTF, GLTF]")
@@ -179,5 +156,5 @@ TEST_CASE("Building valid Model object from GLTF files", "[Model, ParserGLTF, GL
 
   REQUIRE_NOTHROW(parser.get_model());
 
-  cleanup_dummy_opengl_context(p_window, context);
+  cleanup_opengl_context(p_window, context);
 }
