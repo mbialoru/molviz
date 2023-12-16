@@ -44,6 +44,14 @@ std::vector<Vertex> ParserGLTF::assemble_vertices(std::vector<glm::vec3> t_posit
 {
   std::vector<Vertex> vertices;
 
+  // check for vector size equality
+  if (not(t_positions.size() == t_normals.size() and t_positions.size() == t_colors.size())) {
+    spdlog::debug(fmt::format("positions {}", t_positions.size()));
+    spdlog::debug(fmt::format("normals {}", t_normals.size()));
+    spdlog::debug(fmt::format("colors {}", t_colors.size()));
+    throw InvalidArgumentLogged(fmt::format("vertex vector sizes do not match"));
+  }
+
   for (std::size_t i{ 0 }; i < t_positions.size(); ++i) {
     vertices.emplace_back(
       t_positions.at(i), t_normals.at(i), glm::vec3(t_colors.at(i).r, t_colors.at(i).g, t_colors.at(i).b));
@@ -141,6 +149,10 @@ void ParserGLTF::load_mesh(const std::size_t t_mesh_index)
     color_vector.begin(), color_vector.end(), std::back_inserter(color_floats), map_to_float_range<uint16_t, float>());
   std::vector<glm::vec4> colors{ group_into_vec4<float>(color_floats) };
 
+  // TODO: REMOVE THIS
+  colors.emplace_back(1.0F, 1.0F, 1.0F, 1.0F);
+  colors.emplace_back(1.0F, 1.0F, 1.0F, 1.0F);
+
   std::vector<uint8_t> position_bytes{ get_accessor_data(m_json["accessors"][position_access_index]) };
   std::vector<float> position_vector{ convert_bytes<float>(position_bytes) };
   std::vector<glm::vec3> positions{ group_into_vec3<float>(position_vector) };
@@ -152,7 +164,8 @@ void ParserGLTF::load_mesh(const std::size_t t_mesh_index)
   std::vector<Vertex> vertices{ assemble_vertices(positions, normals, colors) };
 
   std::vector<uint8_t> indice_bytes{ get_accessor_data(m_json["accessors"][index_access_index]) };
-  std::vector<GLuint> indices{ convert_bytes<GLuint, uint16_t>(indice_bytes) };
+  std::vector<uint16_t> indice_vector{ convert_bytes<uint16_t>(indice_bytes) };
+  std::vector<GLuint> indices{ indice_vector.begin(), indice_vector.end() };
 
   m_meshes.push_back(Mesh(vertices, indices));
 

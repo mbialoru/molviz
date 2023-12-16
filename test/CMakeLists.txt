@@ -19,9 +19,10 @@ file(
   GLOB
   TESTS_SRCS
   CONFIGURE_DEPENDS
-  ${CMAKE_CURRENT_SOURCE_DIR}/test_*.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/test_*.cpp)
 
 add_executable(tests ${TESTS_SRCS})
+target_include_directories(tests PRIVATE include)
 target_link_libraries(
   tests
   PRIVATE ${CMAKE_PROJECT_NAME}::project_warnings
@@ -65,7 +66,8 @@ catch_discover_tests(
 # ---- Constexpr tests ----
 
 # add a file containing a set of constexpr tests
-add_executable(constexpr_tests constexpr_tests.cpp)
+add_executable(constexpr_tests src/constexpr_tests.cpp)
+target_include_directories(constexpr_tests PRIVATE include)
 target_link_libraries(
   constexpr_tests
   PRIVATE ${CMAKE_PROJECT_NAME}::project_warnings
@@ -89,7 +91,8 @@ catch_discover_tests(
 # disable the constexpr portion of the test, and build again this allows us to
 # have an executable that we can debug when things go wrong with the constexpr
 # testing
-add_executable(relaxed_constexpr_tests constexpr_tests.cpp)
+add_executable(relaxed_constexpr_tests src/constexpr_tests.cpp)
+target_include_directories(relaxed_constexpr_tests PRIVATE include)
 target_link_libraries(
   relaxed_constexpr_tests
   PRIVATE ${CMAKE_PROJECT_NAME}::project_warnings
