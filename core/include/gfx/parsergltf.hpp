@@ -44,7 +44,7 @@ private:
 
     std::vector<glm::vec<2, T, glm::defaultp>> grouped;
 
-    for (std::size_t i{ 0 }; i < tr_data.size() / 2; i += 2) { grouped.emplace_back(tr_data[i + 0], tr_data[i + 1]); }
+    for (std::size_t i{ 0 }; i < tr_data.size(); i += 2) { grouped.emplace_back(tr_data[i + 0], tr_data[i + 1]); }
 
     return grouped;
   }
@@ -55,7 +55,7 @@ private:
 
     std::vector<glm::vec<3, T, glm::defaultp>> grouped;
 
-    for (std::size_t i{ 0 }; i < tr_data.size() / 3; i += 3) {
+    for (std::size_t i{ 0 }; i < tr_data.size(); i += 3) {
       grouped.emplace_back(tr_data[i + 0], tr_data[i + 1], tr_data[i + 2]);
     }
     return grouped;
@@ -67,7 +67,7 @@ private:
 
     std::vector<glm::vec<4, T, glm::defaultp>> grouped;
 
-    for (std::size_t i{ 0 }; i < tr_data.size() / 4; i += 4) {
+    for (std::size_t i{ 0 }; i < tr_data.size(); i += 4) {
       grouped.emplace_back(tr_data[i + 0], tr_data[i + 1], tr_data[i + 2], tr_data[i + 3]);
     }
     return grouped;
@@ -90,23 +90,21 @@ private:
   template<typename T> std::vector<uint8_t> h_get_accessor_data(nlohmann::json t_accessor)
   {
     //!! WARNING: do not use curly brace initialization with json lib types, internal types mismatch shenanigans
-    std::size_t buffer_view_index = t_accessor.value("bufferView", 1);
-    std::size_t count = t_accessor["count"];
+    std::size_t buffer_view_index = t_accessor.at("bufferView");
+    std::size_t element_count = t_accessor["count"];
     std::size_t access_byte_offset = t_accessor.value("byteOffset", 0);
-    std::string type = t_accessor["type"];
+    std::string element_type = t_accessor["type"];
 
     nlohmann::json buffer_view = m_json["bufferViews"][buffer_view_index];
 
     std::size_t byte_offset{ buffer_view["byteOffset"] };
+    std::size_t byte_length{ buffer_view["byteLength"] };
+    std::size_t data_begin{ byte_offset + access_byte_offset };
+    std::size_t data_size{ element_count * sizeof(T) * get_vertex_stride<T>(element_type) };
 
-    std::vector<uint8_t> data;
+    if (data_size != byte_length) { throw RuntimeErrorLogged("data size doesn't match byte length"); }
 
-    std::size_t data_begin = byte_offset + access_byte_offset;
-    std::size_t data_size = count * sizeof(T) * get_vertex_stride<T>(type);
-
-    for (std::size_t i{ data_begin }; i < data_begin + data_size; i += sizeof(T)) {
-      for (std::size_t j{ 0 }; j < sizeof(T); ++j) { data.push_back(m_data[i + j]); }
-    }
+    std::vector<uint8_t> data(m_data.begin() + data_begin, m_data.begin() + data_begin + data_size);
 
     spdlog::debug(fmt::format("loaded {} bytes from accessor", data.size()));
 
