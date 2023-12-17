@@ -139,14 +139,13 @@ int main(int argc, char **argv)
   ParserGLTF parser{ std::filesystem::absolute(model_gltf_file) };
   Model model{ parser.get_model() };
 
-  uint32_t last_frametime{ 0 };
-  uint32_t this_frametime{ 0 };
-
   // main loop
   bool done = false;
 
+  uint32_t this_frametime{ 0 };
+
   while (!done) {
-    last_frametime = this_frametime;
+    uint32_t last_frametime{ this_frametime };
     this_frametime = SDL_GetTicks();
 
     // Poll and handle events (inputs, window resize, etc.)
