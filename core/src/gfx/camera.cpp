@@ -26,6 +26,8 @@ void Camera::export_matrix(Shader &t_shader, const char *tp_uniform)
 
 void Camera::handle_inputs(const SDL_Event &tr_event, SDL_Window *tp_window)
 {
+  // TODO: input handling can have its own class, also event-based input is
+  // worse than state-based input
   handle_inputs_keyboard(tr_event);
   handle_inputs_mouse(tr_event, tp_window);
 }
@@ -144,6 +146,12 @@ void Camera::handle_inputs_mouse(const SDL_Event &tr_event, SDL_Window *tp_windo
       break;
     }
   }
+
+  if (SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON_LMASK) {
+    message += "(M) key hold: LMB";
+    mouse_rotate(tp_window);
+  }
+
   if (message.length() > 0) { spdlog::debug(message); }
 }
 
