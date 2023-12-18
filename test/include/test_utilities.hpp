@@ -15,4 +15,12 @@ public:
   void testRunStarting(Catch::TestRunInfo const &_) override { spdlog::set_level(spdlog::level::debug); }
 };
 
+// event listener  to disable log output
+class disable_loging : public Catch::EventListenerBase
+{
+public:
+  using Catch::EventListenerBase::EventListenerBase;
+  void testRunStarting(Catch::TestRunInfo const &_) override { spdlog::set_level(spdlog::level::off); }
+};
+
 #endif// TEST_UTILITIES_HPP

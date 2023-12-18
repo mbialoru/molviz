@@ -10,7 +10,9 @@
 #include "gfx/vertexarray.hpp"
 #include "gfx/vertexbuffer.hpp"
 
-CATCH_REGISTER_LISTENER(debug_log_level)
+// NOTE: uncomment to enable debug level log output in tests
+// CATCH_REGISTER_LISTENER(debug_log_level)
+CATCH_REGISTER_LISTENER(disable_loging)
 
 // test cases
 TEST_CASE("ElementBuffer valid creation and cleanup", "[ElementBuffer, EBO]")
@@ -107,6 +109,34 @@ TEST_CASE("Default Shader valid creation and cleanup", "[Shader]")
   shader.cleanup();
 
   REQUIRE_FALSE(glIsProgram(shader.id));
+
+  cleanup_opengl_context(p_window, context);
+}
+
+TEST_CASE("Invalid vertex shader compile error", "[Shader]")
+{
+  using namespace Molviz::gfx;
+
+  std::filesystem::path vertex_shader{ "/workspaces/molviz/test/resources/shaders/invalid.vert" };
+  std::filesystem::path fragment_shader{ "/workspaces/molviz/test/resources/shaders/empty.frag" };
+
+  auto [p_window, context]{ create_dummy_opengl_context() };
+
+  REQUIRE_THROWS(Shader(vertex_shader, fragment_shader));
+
+  cleanup_opengl_context(p_window, context);
+}
+
+TEST_CASE("Invalid fragment shader compile error", "[Shader]")
+{
+  using namespace Molviz::gfx;
+
+  std::filesystem::path vertex_shader{ "/workspaces/molviz/test/resources/shaders/empty.vert" };
+  std::filesystem::path fragment_shader{ "/workspaces/molviz/test/resources/shaders/invalid.frag" };
+
+  auto [p_window, context]{ create_dummy_opengl_context() };
+
+  REQUIRE_THROWS(Shader(vertex_shader, fragment_shader));
 
   cleanup_opengl_context(p_window, context);
 }
