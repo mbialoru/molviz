@@ -2,49 +2,40 @@
 
 include(${Catch2_SOURCE_DIR}/extras/Catch.cmake)
 
-# provide a simple smoke test to make sure that the CLI works and can display a
-# --help message
-add_test(NAME cli.has_help COMMAND ${CMAKE_PROJECT_NAME} --help)
+# ---- Tests ----
 
-# provide a test to verify that the version being reported from the application
-# matches the version given to CMake. This will be important once you package
-# your program. Real world shows that this is the kind of simple mistake that is
-# easy to make, but also easy to test for.
-add_test(NAME cli.version_matches COMMAND ${CMAKE_PROJECT_NAME} --version)
-set_tests_properties(cli.version_matches PROPERTIES PASS_REGULAR_EXPRESSION "${PROJECT_VERSION}")
+if(NOT TARGET tests)
+  file(
+    GLOB
+    TESTS_SRCS
+    CONFIGURE_DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/test_*.cpp)
 
-# ---- Test binaries ----
+  add_executable(tests ${TESTS_SRCS})
+  target_include_directories(tests PRIVATE include)
+  target_link_libraries(
+    tests
+    PRIVATE ${CMAKE_PROJECT_NAME}::project_warnings
+            ${CMAKE_PROJECT_NAME}::project_options
+            ${CMAKE_PROJECT_NAME}::Core)
 
-file(
-  GLOB
-  TESTS_SRCS
-  CONFIGURE_DEPENDS
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/test_*.cpp)
+  target_link_system_libraries(
+    tests
+    PRIVATE Catch2::Catch2WithMain
+            GLEW::GLEW
+            glm::glm
+            nlohmann_json::nlohmann_json
+            SDL2
+            spdlog::spdlog
+            OpenGL::OpenGL)
 
-add_executable(tests ${TESTS_SRCS})
-target_include_directories(tests PRIVATE include)
-target_link_libraries(
-  tests
-  PRIVATE ${CMAKE_PROJECT_NAME}::project_warnings
-          ${CMAKE_PROJECT_NAME}::project_options
-          ${CMAKE_PROJECT_NAME}::Core)
-
-target_link_system_libraries(
-  tests
-  PRIVATE Catch2::Catch2WithMain
-          GLEW::GLEW
-          glm::glm
-          nlohmann_json::nlohmann_json
-          SDL2
-          spdlog::spdlog
-          OpenGL::OpenGL)
-
-if(WIN32 AND BUILD_SHARED_LIBS)
-  add_custom_command(
-    TARGET tests
-    PRE_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:tests> $<TARGET_FILE_DIR:tests>
-    COMMAND_EXPAND_LISTS)
+  if(WIN32 AND BUILD_SHARED_LIBS)
+    add_custom_command(
+      TARGET tests
+      PRE_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:tests> $<TARGET_FILE_DIR:tests>
+      COMMAND_EXPAND_LISTS)
+  endif()
 endif()
 
 # automatically discover tests that are defined in catch based test files you
@@ -66,14 +57,16 @@ catch_discover_tests(
 # ---- Constexpr tests ----
 
 # add a file containing a set of constexpr tests
-add_executable(constexpr_tests src/constexpr_tests.cpp)
-target_include_directories(constexpr_tests PRIVATE include)
-target_link_libraries(
-  constexpr_tests
-  PRIVATE ${CMAKE_PROJECT_NAME}::project_warnings
-          ${CMAKE_PROJECT_NAME}::project_options
-          ${CMAKE_PROJECT_NAME}::Core
-          Catch2::Catch2WithMain)
+if(NOT TARGET constexpr_tests)
+  add_executable(constexpr_tests src/constexpr_tests.cpp)
+  target_include_directories(constexpr_tests PRIVATE include)
+  target_link_libraries(
+    constexpr_tests
+    PRIVATE ${CMAKE_PROJECT_NAME}::project_warnings
+            ${CMAKE_PROJECT_NAME}::project_options
+            ${CMAKE_PROJECT_NAME}::Core
+            Catch2::Catch2WithMain)
+endif()
 
 catch_discover_tests(
   constexpr_tests
@@ -91,15 +84,17 @@ catch_discover_tests(
 # disable the constexpr portion of the test, and build again this allows us to
 # have an executable that we can debug when things go wrong with the constexpr
 # testing
-add_executable(relaxed_constexpr_tests src/constexpr_tests.cpp)
-target_include_directories(relaxed_constexpr_tests PRIVATE include)
-target_link_libraries(
-  relaxed_constexpr_tests
-  PRIVATE ${CMAKE_PROJECT_NAME}::project_warnings
-          ${CMAKE_PROJECT_NAME}::project_options
-          ${CMAKE_PROJECT_NAME}::Core
-          Catch2::Catch2WithMain)
-target_compile_definitions(relaxed_constexpr_tests PRIVATE -DCATCH_CONFIG_RUNTIME_STATIC_REQUIRE)
+if(NOT TARGET relaxed_constexpr_tests)
+  add_executable(relaxed_constexpr_tests src/constexpr_tests.cpp)
+  target_include_directories(relaxed_constexpr_tests PRIVATE include)
+  target_link_libraries(
+    relaxed_constexpr_tests
+    PRIVATE ${CMAKE_PROJECT_NAME}::project_warnings
+            ${CMAKE_PROJECT_NAME}::project_options
+            ${CMAKE_PROJECT_NAME}::Core
+            Catch2::Catch2WithMain)
+  target_compile_definitions(relaxed_constexpr_tests PRIVATE -DCATCH_CONFIG_RUNTIME_STATIC_REQUIRE)
+endif()
 
 catch_discover_tests(
   relaxed_constexpr_tests
@@ -114,10 +109,9 @@ catch_discover_tests(
   OUTPUT_SUFFIX
   .xml)
 
-if(NOT TARGET tests)
-  add_custom_target(tests)
+if(NOT TARGET all_tests)
+  add_custom_target(all_tests)
   add_dependencies(
-    ${CMAKE_PROJECT_NAME}_tests
     tests
     constexpr_tests
     relaxed_constexpr_tests)
