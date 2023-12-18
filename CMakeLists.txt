@@ -20,7 +20,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # add git variables
-include(${CMAKE_SOURCE_DIR}/cmake/GitVars.cmake)
+include(cmake/GitVars.cmake)
 
 # set the project name and language
 project(

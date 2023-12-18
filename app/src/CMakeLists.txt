@@ -18,7 +18,7 @@ if(NOT TARGET ${CMAKE_PROJECT_NAME})
             SDL2
             spdlog::spdlog)
 
-  target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "${CMAKE_BINARY_DIR}/app/${CMAKE_PROJECT_NAME}/include")
+  target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "${CMAKE_BINARY_DIR}/app/include")
 
   add_dependencies(${CMAKE_PROJECT_NAME} ${CMAKE_PROJECT_NAME}_resources)
 
