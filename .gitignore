@@ -363,3 +363,6 @@ $RECYCLE.BIN/
 *.box
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,c++,linux,windows,c,emacs,vim,git,qt,qtcreator,cmake,vagrant
+
+### generated build system source files ###
+**/config.h*
