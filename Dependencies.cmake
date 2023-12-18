@@ -21,7 +21,7 @@ function(project_setup_dependencies)
   endif()
 
   if(NOT TARGET Catch2::Catch2WithMain)
-    cpmaddpackage("gh:catchorg/Catch2#v3.4.0")
+    cpmaddpackage("gh:catchorg/Catch2#v3.5.0")
   endif()
 
   if(NOT TARGET CLI11::CLI11)
@@ -29,11 +29,11 @@ function(project_setup_dependencies)
   endif()
 
   if(NOT TARGET SDL2::SDL2)
-    cpmaddpackage("gh:libsdl-org/SDL#release-2.28.3")
+    cpmaddpackage("gh:libsdl-org/SDL#release-2.28.5")
   endif()
 
   if(NOT TARGET imgui)
-    cpmaddpackage("gh:ocornut/imgui#v1.89.9")
+    cpmaddpackage("gh:ocornut/imgui#v1.90")
 
     add_library(imgui STATIC
     ${imgui_SOURCE_DIR}/imgui.cpp
@@ -56,7 +56,7 @@ function(project_setup_dependencies)
   endif()
 
   if(NOT TARGET nlohmann_json::nlohmann_json)
-    cpmaddpackage("gh:nlohmann/json#v3.11.2")
+    cpmaddpackage("gh:nlohmann/json#v3.11.3")
   endif()
 
 endfunction()
