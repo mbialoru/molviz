@@ -6,7 +6,7 @@
 // Includes here
 
 
-namespace Molviz {
+namespace Molviz::io {
 
 class InputHandler
 {
@@ -17,6 +17,6 @@ public:
 private:
 };
 
-}// namespace Molviz
+}// namespace Molviz::io
 
 #endif// INPUTHANDLER_HPP
