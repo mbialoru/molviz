@@ -48,6 +48,9 @@
 * Optional arguments should be prepended with ‘o_’ rest of the name should
   follow snake_case.
 
+* If creating helper-caller function structures and naming helper(s) after
+  caller function, then prepend helper(s) name with `h_`
+
 * The variable name should begin with an alphabet ASCII character, rest should
   follow snake_case rule.
 
@@ -124,7 +127,7 @@
 * Class elements ordering
   * In a class, place attributes after methods. Place static elements before
     non-static ones. Separate groups of methods or attributes, group by type.
-    
+
   ```cpp
   class DataProcessor
   {
@@ -155,7 +158,7 @@
     * set_ set value.
 
   The same name convention is used as that for the variable/attribute names.
-  
+
   ```cpp
   int get_value();
   int solve_equation();
@@ -167,12 +170,24 @@
   int connect_to_database(int t_access_mode, std::string t_database_address);
   ```
 
-  Optional arguments should be prepended with ‘o_’ rest of the name should follow
-  snake_case.
+  Optional arguments should be prepended with ‘o_’ rest of the name should
+  follow snake_case.
 
   ```cpp
   int open_file(std::string t_filename, std::string to_mode);
   ```
+
+  If creating helper-caller function structures and naming helper(s) after
+  caller function, then prepend helper(s) name with ‘h_’.
+
+  ```cpp
+  void h_conduct_operation(double t_a, double t_b);
+  void conduct_operation(double t_a, double t_b)
+  {
+    /* code */
+    h_conduct_operation(t_a, t_b);
+    /* code */
+  }
 
 * Variables
 
@@ -214,8 +229,8 @@
   ```cpp
   static int s_count;
   ```
-    
-  Avoid initializing multiple variables in one line to avoid common problems 
+
+  Avoid initializing multiple variables in one line to avoid common problems
   with initial value or pointer types.
   ```cpp
   int* a, b, c; // only a is a pointer !
