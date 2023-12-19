@@ -13,21 +13,19 @@ if(NOT TARGET tests)
 
   add_executable(tests ${TESTS_SRCS})
   target_include_directories(tests PRIVATE include)
-  target_link_libraries(
-    tests
-    PRIVATE ${CMAKE_PROJECT_NAME}::project_warnings
-            ${CMAKE_PROJECT_NAME}::project_options
-            ${CMAKE_PROJECT_NAME}::Core)
+  target_link_libraries(tests PRIVATE ${CMAKE_PROJECT_NAME}::project_warnings ${CMAKE_PROJECT_NAME}::project_options
+                                      ${CMAKE_PROJECT_NAME}::Core)
 
   target_link_system_libraries(
     tests
-    PRIVATE Catch2::Catch2WithMain
-            GLEW::GLEW
-            glm::glm
-            nlohmann_json::nlohmann_json
-            SDL2
-            spdlog::spdlog
-            OpenGL::OpenGL)
+    PRIVATE
+    Catch2::Catch2WithMain
+    GLEW::GLEW
+    glm::glm
+    nlohmann_json::nlohmann_json
+    SDL2
+    spdlog::spdlog
+    OpenGL::OpenGL)
 
   if(WIN32 AND BUILD_SHARED_LIBS)
     add_custom_command(
@@ -111,8 +109,5 @@ catch_discover_tests(
 
 if(NOT TARGET all_tests)
   add_custom_target(all_tests)
-  add_dependencies(
-    tests
-    constexpr_tests
-    relaxed_constexpr_tests)
+  add_dependencies(all_tests tests constexpr_tests relaxed_constexpr_tests)
 endif()

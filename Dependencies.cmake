@@ -14,8 +14,10 @@ function(project_setup_dependencies)
 
   if(NOT TARGET spdlog::spdlog)
     cpmaddpackage(
-      GITHUB_REPOSITORY gabime/spdlog
-      VERSION 1.12.0
+      GITHUB_REPOSITORY
+      gabime/spdlog
+      VERSION
+      1.12.0
       OPTIONS
       "SPDLOG_FMT_EXTERNAL ON")
   endif()
@@ -35,15 +37,14 @@ function(project_setup_dependencies)
   if(NOT TARGET imgui)
     cpmaddpackage("gh:ocornut/imgui#v1.90")
 
-    add_library(imgui STATIC
-    ${imgui_SOURCE_DIR}/imgui.cpp
-    ${imgui_SOURCE_DIR}/imgui_draw.cpp
-    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
-    ${imgui_SOURCE_DIR}/imgui_tables.cpp
-
-    ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl2.cpp
-    ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
-    )
+    add_library(
+      imgui STATIC
+      ${imgui_SOURCE_DIR}/imgui.cpp
+      ${imgui_SOURCE_DIR}/imgui_draw.cpp
+      ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+      ${imgui_SOURCE_DIR}/imgui_tables.cpp
+      ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl2.cpp
+      ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp)
 
     target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends)
     target_compile_definitions(imgui PUBLIC -DIMGUI_DISABLE_OBSOLETE_FUNCTIONS)
