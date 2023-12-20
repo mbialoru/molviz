@@ -15,7 +15,15 @@ public:
   void testRunStarting(Catch::TestRunInfo const &_) override { spdlog::set_level(spdlog::level::debug); }
 };
 
-// event listener  to disable log output
+// event listener to set loglevel to trace
+class trace_log_level : public Catch::EventListenerBase
+{
+public:
+  using Catch::EventListenerBase::EventListenerBase;
+  void testRunStarting(Catch::TestRunInfo const &_) override { spdlog::set_level(spdlog::level::trace); }
+};
+
+// event listener to disable log output
 class disable_loging : public Catch::EventListenerBase
 {
 public:

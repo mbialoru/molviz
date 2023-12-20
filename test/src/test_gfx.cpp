@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "test_gfx_utilities.hpp"
 #include "test_utilities.hpp"
+#include "test_utilities_gfx.hpp"
 
 #include "gfx/elementbuffer.hpp"
 #include "gfx/mesh.hpp"
@@ -9,10 +9,6 @@
 #include "gfx/shader.hpp"
 #include "gfx/vertexarray.hpp"
 #include "gfx/vertexbuffer.hpp"
-
-// NOTE: uncomment to enable debug level log output in tests
-// CATCH_REGISTER_LISTENER(debug_log_level)
-CATCH_REGISTER_LISTENER(disable_loging)
 
 // test cases
 TEST_CASE("ElementBuffer valid creation and cleanup", "[ElementBuffer, EBO]")
