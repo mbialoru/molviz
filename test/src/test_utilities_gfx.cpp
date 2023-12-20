@@ -1,12 +1,4 @@
-#ifndef TEST_GFX_UTILITIES_HPP
-#define TEST_GFX_UTILITIES_HPP
-
-#pragma once
-
-#include <GL/glew.h>
-#include <SDL.h>
-#include <catch2/catch_test_macros.hpp>
-#include <spdlog/spdlog.h>
+#include "test_utilities_gfx.hpp"
 
 // create dummy zero-size window for valid opengl context
 std::pair<SDL_Window *, SDL_GLContext> create_dummy_opengl_context()
@@ -32,6 +24,7 @@ std::pair<SDL_Window *, SDL_GLContext> create_dummy_opengl_context()
   return { p_window, context };
 }
 
+// create visible window with opengl context
 std::pair<SDL_Window *, SDL_GLContext> create_real_opengl_context()
 {
   // init SDL
@@ -41,7 +34,7 @@ std::pair<SDL_Window *, SDL_GLContext> create_real_opengl_context()
   }
 
   // create real visible SDL window for OpenGL context
-  SDL_WindowFlags window_flags{ static_cast<SDL_WindowFlags>(SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN) };
+  SDL_WindowFlags window_flags{ static_cast<SDL_WindowFlags>(SDL_WINDOW_OPENGL) };
   SDL_Window *p_window{ SDL_CreateWindow(
     nullptr, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 800, window_flags) };
   SDL_GLContext context{ SDL_GL_CreateContext(p_window) };
@@ -63,5 +56,3 @@ void cleanup_opengl_context(SDL_Window *tp_window, SDL_GLContext t_context)
   SDL_DestroyWindow(tp_window);
   SDL_Quit();
 }
-
-#endif// TEST_GFX_UTILITIES_HPP
