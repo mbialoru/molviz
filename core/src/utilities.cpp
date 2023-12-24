@@ -30,3 +30,24 @@ std::string Molviz::file_contents_to_string(const std::filesystem::path &tr_file
   }
   return file_content;
 }
+
+bool Molviz::file_exists(const char *tp_file)
+{
+  const std::filesystem::path file{ std::string(tp_file) };
+  return file_exists(file);
+}
+
+bool Molviz::file_exists(const std::string &tr_file)
+{
+  const std::filesystem::path file{ tr_file };
+  return file_exists(file);
+}
+
+bool Molviz::file_exists(const std::filesystem::path &tr_file,
+  std::filesystem::file_status t_status = std::filesystem::file_status{})
+{
+  if (std::filesystem::status_known(t_status) ? std::filesystem::exists(t_status) : std::filesystem::exists(tr_file)) {
+    return true;
+  }
+  return false;
+}

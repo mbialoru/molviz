@@ -51,7 +51,7 @@ def main(argv: argparse.Namespace):
             f.write(f"#ifndef {filename_upper}_HPP\n")
             f.write(f"#define {filename_upper}_HPP\n\n")
             f.write("#pragma once\n\n")
-            f.write("// Includes here\n\n")
+            f.write("// Includes here\n")
             if namespace := getattr(argv, "namespace"):
                 f.write(f"\nnamespace {namespace} {{\n\n")
             if name := getattr(argv, "class"):
