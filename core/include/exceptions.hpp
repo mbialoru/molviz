@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <string>
 
-namespace Molviz {
+namespace mve {
 
 class NotImplementedException : public std::exception
 {
@@ -52,6 +52,6 @@ private:
   std::string m_error_message;
 };
 
-}// namespace Molviz
+}// namespace mve
 
 #endif// EXCEPTIONS_HPP

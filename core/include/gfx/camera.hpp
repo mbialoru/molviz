@@ -14,7 +14,7 @@
 #include "exceptions.hpp"
 #include "shader.hpp"
 
-namespace Molviz::gfx {
+namespace mve::gfx {
 
 class Camera
 {
@@ -23,7 +23,7 @@ public:
   ~Camera() = default;
 
   void update_matrix(const float t_fov_degrees, const float t_near_plane, const float t_far_plane);
-  void export_matrix(Molviz::gfx::Shader &t_shader, const char *tp_uniform);
+  void export_matrix(mve::gfx::Shader &t_shader, const char *tp_uniform);
   void handle_inputs(const SDL_Event &tr_event, SDL_Window *tp_window);
 
   glm::vec3 position;
@@ -46,6 +46,6 @@ private:
   void mouse_reset();
 };
 
-}// namespace Molviz::gfx
+}// namespace mve::gfx
 
 #endif// CAMERA_HPP

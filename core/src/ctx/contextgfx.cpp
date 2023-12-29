@@ -1,9 +1,8 @@
 #include "ctx/contextgfx.hpp"
 
-using namespace Molviz::ctx;
+using namespace mve::ctx;
 
-template<>
-std::unique_ptr<ContextGFX> Molviz::cls::Singleton<ContextGFX>::mp_instance{ std::make_unique<ContextGFX>() };
+template<> std::unique_ptr<ContextGFX> mve::cls::Singleton<ContextGFX>::mp_instance{ std::make_unique<ContextGFX>() };
 
 ContextGFX::ContextGFX() : initialized(false){};
 

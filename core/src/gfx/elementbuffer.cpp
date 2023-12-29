@@ -1,6 +1,6 @@
 #include "gfx/elementbuffer.hpp"
 
-using namespace Molviz::gfx;
+using namespace mve::gfx;
 
 ElementBuffer::ElementBuffer(std::vector<GLuint> &tr_indices)
 {

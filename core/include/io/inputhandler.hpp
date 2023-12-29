@@ -17,7 +17,7 @@
 
 constexpr intmax_t UPS_VALUE{ 60 };
 
-namespace Molviz::io {
+namespace mve::io {
 
 class InputHandler
 {
@@ -39,6 +39,6 @@ private:
   std::thread m_worker_thread;
 };
 
-}// namespace Molviz::io
+}// namespace mve::io
 
 #endif// INPUTHANDLER_HPP

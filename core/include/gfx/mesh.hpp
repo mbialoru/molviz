@@ -10,7 +10,7 @@
 #include "elementbuffer.hpp"
 #include "vertexarray.hpp"
 
-namespace Molviz::gfx {
+namespace mve::gfx {
 
 class Mesh
 {
@@ -34,6 +34,6 @@ private:
   std::shared_ptr<ElementBuffer> mp_element_buffer;
 };
 
-}// namespace Molviz::gfx
+}// namespace mve::gfx
 
 #endif// MESH_HPP

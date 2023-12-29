@@ -3,15 +3,21 @@
 
 #pragma once
 
-#include <nlohmann/json.hpp>
-
 #include "mesh.hpp"
 
-namespace Molviz::gfx {
+namespace mve::gfx {
+
+typedef std::tuple<std::vector<Mesh> &,
+  std::vector<glm::vec3> &,
+  std::vector<glm::vec3> &,
+  std::vector<glm::quat> &,
+  std::vector<glm::mat4> &>
+  ModelData;
 
 class Model
 {
 public:
+  Model(ModelData t_data);
   Model(const std::vector<Mesh> &tr_meshes,
     const std::vector<glm::vec3> &tr_translations,
     const std::vector<glm::vec3> &tr_scales,
@@ -29,6 +35,6 @@ private:
   std::vector<glm::mat4> m_matrices;
 };
 
-};// namespace Molviz::gfx
+};// namespace mve::gfx
 
 #endif// MODEL_HPP

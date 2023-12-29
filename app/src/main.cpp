@@ -13,12 +13,12 @@
 
 #include "gfx/parsergltf.hpp"
 
-using Molviz::gfx::Vertex;
-using Molviz::gfx::Shader;
-using Molviz::gfx::Mesh;
-using Molviz::gfx::Model;
-using Molviz::gfx::Camera;
-using Molviz::gfx::ParserGLTF;
+using mve::gfx::Vertex;
+using mve::gfx::Shader;
+using mve::gfx::Mesh;
+using mve::gfx::Model;
+using mve::gfx::Camera;
+using mve::gfx::ParserGLTF;
 
 // main code
 int main(int argc, char **argv)

@@ -7,7 +7,7 @@
 
 #include "vertexbuffer.hpp"
 
-namespace Molviz::gfx {
+namespace mve::gfx {
 
 class VertexArray
 {
@@ -31,6 +31,6 @@ public:
 // convenient type alias
 using VAO = VertexArray;
 
-}// namespace Molviz::gfx
+}// namespace mve::gfx
 
 #endif// VERTEXARRAY_HPP

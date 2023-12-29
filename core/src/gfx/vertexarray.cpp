@@ -1,6 +1,6 @@
 #include "gfx/vertexarray.hpp"
 
-using namespace Molviz::gfx;
+using namespace mve::gfx;
 
 VertexArray::VertexArray() { glGenVertexArrays(1, &id); };
 

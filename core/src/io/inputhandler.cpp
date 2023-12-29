@@ -1,6 +1,6 @@
 #include "io/inputhandler.hpp"
 
-using namespace Molviz::io;
+using namespace mve::io;
 
 InputHandler::InputHandler() : m_worker_enabled(true)
 {

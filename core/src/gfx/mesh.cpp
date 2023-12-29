@@ -1,6 +1,6 @@
 #include "gfx/mesh.hpp"
 
-using namespace Molviz::gfx;
+using namespace mve::gfx;
 
 Mesh::Mesh(const std::vector<Vertex> &tr_vertices, const std::vector<GLuint> &tr_indices)
   : m_vertices(tr_vertices), m_indices(tr_indices), mp_vertex_array(std::make_shared<VertexArray>())

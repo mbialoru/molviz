@@ -7,7 +7,7 @@
 #include "gfx/camera.hpp"
 #include "gfx/shader.hpp"
 
-namespace Molviz::ctx {
+namespace mve::ctx {
 
 class ContextGFX final : public cls::Singleton<ContextGFX>
 {
@@ -40,6 +40,6 @@ private:
   bool initialized;
 };
 
-}// namespace Molviz::ctx
+}// namespace mve::ctx
 
 #endif// CONTEXTGFX_HPP

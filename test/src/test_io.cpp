@@ -11,14 +11,14 @@ CATCH_REGISTER_LISTENER(trace_log_level)
 
 TEST_CASE("InputHandler valid creation and cleanup", "[InputHandler]")
 {
-  using namespace Molviz::io;
+  using namespace mve::io;
 
   REQUIRE_NOTHROW([&]() { InputHandler input_handler; }());
 }
 
 TEST_CASE("InputHandler capturing input", "[InputHandler, Manual]")
 {
-  using namespace Molviz::io;
+  using namespace mve::io;
   using namespace std::chrono_literals;
 
   auto [p_window, context]{ create_real_opengl_context() };
