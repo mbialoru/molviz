@@ -8,7 +8,7 @@
 
 #include "utilities.hpp"
 
-namespace Molviz::gfx {
+namespace mve::gfx {
 
 enum class ShaderType { FRAGMENT, VERTEX, PROGRAM };
 
@@ -31,6 +31,6 @@ private:
   static void compile_errors(GLuint t_shader, const ShaderType t_type);
 };
 
-}// namespace Molviz::gfx
+}// namespace mve::gfx
 
 #endif// SHADER_HPP

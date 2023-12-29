@@ -1,8 +1,8 @@
 #include "gfx/shader.hpp"
 
-using namespace Molviz::gfx;
+using namespace mve::gfx;
 
-std::string Molviz::gfx::shader_type_to_string(const ShaderType t_type)
+std::string mve::gfx::shader_type_to_string(const ShaderType t_type)
 {
   switch (t_type) {
   case ShaderType::PROGRAM:

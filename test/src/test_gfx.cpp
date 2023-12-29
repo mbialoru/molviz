@@ -13,7 +13,7 @@
 // test cases
 TEST_CASE("ElementBuffer valid creation and cleanup", "[ElementBuffer, EBO]")
 {
-  using namespace Molviz::gfx;
+  using namespace mve::gfx;
 
   auto [p_window, context]{ create_dummy_opengl_context() };
 
@@ -33,7 +33,7 @@ TEST_CASE("ElementBuffer valid creation and cleanup", "[ElementBuffer, EBO]")
 
 TEST_CASE("VertexBuffer valud creation and cleanup", "[VertexBuffer, VBO]")
 {
-  using namespace Molviz::gfx;
+  using namespace mve::gfx;
 
   auto [p_window, context]{ create_dummy_opengl_context() };
 
@@ -52,7 +52,7 @@ TEST_CASE("VertexBuffer valud creation and cleanup", "[VertexBuffer, VBO]")
 
 TEST_CASE("VertexArray valid creation and cleanup", "[VertexArray, VAO]")
 {
-  using namespace Molviz::gfx;
+  using namespace mve::gfx;
 
   auto [p_window, context]{ create_dummy_opengl_context() };
 
@@ -71,7 +71,7 @@ TEST_CASE("VertexArray valid creation and cleanup", "[VertexArray, VAO]")
 
 TEST_CASE("Empty Shader valid creation and cleanup", "[Shader]")
 {
-  using namespace Molviz::gfx;
+  using namespace mve::gfx;
 
   std::filesystem::path vertex_shader{ "/workspaces/molviz/test/resources/shaders/empty.vert" };
   std::filesystem::path fragment_shader{ "/workspaces/molviz/test/resources/shaders/empty.frag" };
@@ -91,7 +91,7 @@ TEST_CASE("Empty Shader valid creation and cleanup", "[Shader]")
 
 TEST_CASE("Default Shader valid creation and cleanup", "[Shader]")
 {
-  using namespace Molviz::gfx;
+  using namespace mve::gfx;
 
   std::filesystem::path vertex_shader{ "/workspaces/molviz/app/resources/shaders/default.vert" };
   std::filesystem::path fragment_shader{ "/workspaces/molviz/app/resources/shaders/default.frag" };
@@ -111,7 +111,7 @@ TEST_CASE("Default Shader valid creation and cleanup", "[Shader]")
 
 TEST_CASE("Invalid vertex shader compile error", "[Shader]")
 {
-  using namespace Molviz::gfx;
+  using namespace mve::gfx;
 
   std::filesystem::path vertex_shader{ "/workspaces/molviz/test/resources/shaders/invalid.vert" };
   std::filesystem::path fragment_shader{ "/workspaces/molviz/test/resources/shaders/empty.frag" };
@@ -125,7 +125,7 @@ TEST_CASE("Invalid vertex shader compile error", "[Shader]")
 
 TEST_CASE("Invalid fragment shader compile error", "[Shader]")
 {
-  using namespace Molviz::gfx;
+  using namespace mve::gfx;
 
   std::filesystem::path vertex_shader{ "/workspaces/molviz/test/resources/shaders/empty.vert" };
   std::filesystem::path fragment_shader{ "/workspaces/molviz/test/resources/shaders/invalid.frag" };
@@ -139,7 +139,7 @@ TEST_CASE("Invalid fragment shader compile error", "[Shader]")
 
 TEST_CASE("Mesh valid creation and cleanup", "[Mesh]")
 {
-  using namespace Molviz::gfx;
+  using namespace mve::gfx;
 
   std::vector<Vertex> vertices{ Vertex{ glm::vec3(-0.1F, -0.1F, 0.1F) },
     Vertex{ glm::vec3(-0.1F, -0.1F, -0.1F) },
@@ -163,7 +163,7 @@ TEST_CASE("Mesh valid creation and cleanup", "[Mesh]")
 
 TEST_CASE("GLTF files valid parsing", "[ParserGLTF, GLTF]")
 {
-  using namespace Molviz::gfx;
+  using namespace mve::gfx;
 
   auto [p_window, context]{ create_dummy_opengl_context() };
 
@@ -174,7 +174,7 @@ TEST_CASE("GLTF files valid parsing", "[ParserGLTF, GLTF]")
 
 TEST_CASE("Building valid Model object from GLTF files", "[Model, ParserGLTF, GLTF]")
 {
-  using namespace Molviz::gfx;
+  using namespace mve::gfx;
 
   auto [p_window, context]{ create_dummy_opengl_context() };
 

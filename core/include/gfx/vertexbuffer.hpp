@@ -7,7 +7,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 
-namespace Molviz::gfx {
+namespace mve::gfx {
 
 struct Vertex
 {
@@ -32,6 +32,6 @@ public:
 // convenient type alias
 using VBO = VertexBuffer;
 
-}// namespace Molviz::gfx
+}// namespace mve::gfx
 
 #endif// VERTEXBUFFER_HPP

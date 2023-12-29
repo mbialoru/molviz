@@ -1,6 +1,6 @@
 #include "gfx/vertexbuffer.hpp"
 
-using namespace Molviz::gfx;
+using namespace mve::gfx;
 
 VertexBuffer::VertexBuffer(std::vector<Vertex> &tr_vertices)
 {

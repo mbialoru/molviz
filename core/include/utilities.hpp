@@ -12,8 +12,11 @@
 
 #include "exceptions.hpp"
 
-namespace Molviz {
+namespace mve {
 
+enum ComponentType { INT8_T = 5120, UINT8_T = 5121, INT16_T = 5122, UINT16_T = 5123, UINT32_T = 5125, FLOAT_T = 5126 };
+
+std::string component_type_to_string(const ComponentType t_type);
 std::string file_contents_to_string(const char *tp_file);
 std::string file_contents_to_string(const std::string &tr_file);
 std::string file_contents_to_string(const std::filesystem::path &tr_file);
@@ -52,6 +55,6 @@ template<typename T, typename P> struct map_to_float_range
   }
 };
 
-}// namespace Molviz
+}// namespace mve
 
 #endif// UTILITIES_HPP

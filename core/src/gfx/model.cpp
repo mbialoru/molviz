@@ -1,6 +1,8 @@
 #include "gfx/model.hpp"
 
-using namespace Molviz::gfx;
+using namespace mve::gfx;
+
+Model::Model(ModelData t_data) { std::make_from_tuple<Model>(t_data); }
 
 Model::Model(const std::vector<Mesh> &tr_meshes,
   const std::vector<glm::vec3> &tr_translations,

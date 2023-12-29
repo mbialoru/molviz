@@ -5,32 +5,28 @@
 
 #include <nlohmann/json.hpp>
 
-#include "model.hpp"
+#include "gfx/model.hpp"
 
-namespace Molviz::gfx {
-
-enum ComponentType { INT8_T = 5120, UINT8_T = 5121, INT16_T = 5122, UINT16_T = 5123, UINT32_T = 5125, FLOAT_T = 5126 };
-
-std::string component_type_to_string(const ComponentType t_type);
+namespace mve::io {
 
 class ParserGLTF
 {
 public:
   ParserGLTF(const char *tp_file);
   ParserGLTF(const std::string &tr_file);
-  ParserGLTF(const std::filesystem::path t_file);
+  ParserGLTF(const std::filesystem::path &tr_file);
   ~ParserGLTF() = default;
 
   void parse(const char *tp_file);
   void parse(const std::string &tr_file);
   void parse(const std::filesystem::path &tr_file);
 
-  Model get_model();
+  gfx::ModelData get_model_data();
 
 private:
-  std::vector<uint8_t> load_bin_file();
+  std::vector<uint8_t> load_bin_file(const std::filesystem::path &tr_file);
 
-  std::vector<Vertex> assemble_vertices(std::vector<glm::vec3> t_positions,
+  std::vector<gfx::Vertex> assemble_vertices(std::vector<glm::vec3> t_positions,
     std::vector<glm::vec3> t_normals,
     std::vector<glm::vec4> t_colors);
 
@@ -115,17 +111,15 @@ private:
 
   std::vector<uint8_t> m_data;
 
-  std::filesystem::path m_file;
-
   nlohmann::json m_json;
 
-  std::vector<Mesh> m_meshes;
+  std::vector<gfx::Mesh> m_meshes;
   std::vector<glm::vec3> m_translations;
   std::vector<glm::vec3> m_scales;
   std::vector<glm::quat> m_rotations;
   std::vector<glm::mat4> m_matrices;
 };
 
-}// namespace Molviz::gfx
+}// namespace mve::io
 
 #endif// PARSERGLTF_HPP

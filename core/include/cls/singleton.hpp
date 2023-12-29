@@ -6,7 +6,7 @@
 #include <memory>
 #include <type_traits>
 
-namespace Molviz::cls {
+namespace mve::cls {
 
 template<typename T> class Singleton
 {
@@ -30,6 +30,6 @@ private:
 
 // NOTES: Oh yes, I _do_ know how fucking ugly this is.
 
-}// namespace Molviz::cls
+}// namespace mve::cls
 
 #endif// SINGLETON_HPP

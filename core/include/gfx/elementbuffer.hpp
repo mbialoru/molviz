@@ -6,7 +6,7 @@
 #include <GL/glew.h>
 #include <vector>
 
-namespace Molviz::gfx {
+namespace mve::gfx {
 
 class ElementBuffer
 {
@@ -24,6 +24,6 @@ public:
 // convenient type alias
 using EBO = ElementBuffer;
 
-}// namespace Molviz::gfx
+}// namespace mve::gfx
 
 #endif// ELEMENTBUFFER_HPP

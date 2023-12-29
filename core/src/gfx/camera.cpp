@@ -1,6 +1,6 @@
 #include "gfx/camera.hpp"
 
-using namespace Molviz::gfx;
+using namespace mve::gfx;
 
 Camera::Camera(const int t_width, const int t_height, const glm::vec3 t_position)
   : position(t_position), orientation(glm::vec3(0.0F, 0.0F, -1.0F)), up(glm::vec3(0.0F, 1.0F, 0.0F)),
