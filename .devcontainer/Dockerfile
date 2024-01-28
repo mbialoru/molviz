@@ -158,6 +158,10 @@ RUN echo "alias cd='HOME=/workspaces/molviz cd'" >> ~/.bashrc
 RUN echo "alias l='ls -a'" >> ~/.bashrc
 RUN echo "alias ll='ls -alFh'" >> ~/.bashrc
 
+# install gef gdb extentions
+RUN wget -O ~/.gdbinit-gef.py -q https://gef.blah.cat/py
+RUN echo source ~/.gdbinit-gef.py >> ~/.gdbinit
+
 # add gdb settings
 RUN echo "set confirm off" >> ~/.gdbinit
 
