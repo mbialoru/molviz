@@ -4,8 +4,8 @@
 		"dockerfile": "Dockerfile",
 		"args": {
 			"VARIANT": "sid-slim",
-			"GCC_VER": "13",
-			"LLVM_VER": "16"
+			"GCC_VER": "14",
+			"LLVM_VER": "19"
 		}
 	},
 	"customizations": {

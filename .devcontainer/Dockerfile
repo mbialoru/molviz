@@ -76,7 +76,7 @@ ENV CONAN_SYSREQUIRES_MODE enabled
 
 # old versions of clang (pre 10) will require significant modifications to the
 # IWYU section
-ARG GCC_VER="13"
+ARG GCC_VER="14"
 # add gcc-${GCC_VER}
 RUN apt-get install -y --no-install-recommends gcc-${GCC_VER} g++-${GCC_VER} gdb
 
@@ -84,7 +84,7 @@ RUN apt-get install -y --no-install-recommends gcc-${GCC_VER} g++-${GCC_VER} gdb
 RUN update-alternatives --install /usr/bin/gcc gcc $(which gcc-${GCC_VER}) 100
 RUN update-alternatives --install /usr/bin/g++ g++ $(which g++-${GCC_VER}) 100
 
-ARG LLVM_VER="16"
+ARG LLVM_VER="19"
 # add clang-${LLVM_VER}
 RUN apt-get install -y --no-install-recommends \
         clang-${LLVM_VER} lldb-${LLVM_VER} lld-${LLVM_VER} clangd-${LLVM_VER} \
