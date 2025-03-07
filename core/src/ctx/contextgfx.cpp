@@ -4,7 +4,7 @@ using namespace mve::ctx;
 
 template<> std::unique_ptr<ContextGFX> mve::cls::Singleton<ContextGFX>::mp_instance{ std::make_unique<ContextGFX>() };
 
-ContextGFX::ContextGFX() : initialized(false){};
+ContextGFX::ContextGFX() : initialized(false) {};
 
 void ContextGFX::initialize()
 {

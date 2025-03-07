@@ -78,7 +78,7 @@ int main(int argc, char **argv)
   // initialize GLEW
   GLenum status{ glewInit() };
   if (status != GLEW_OK) {
-    std::string error_message{ reinterpret_cast<const char*>(glewGetErrorString(status)) };
+    std::string error_message{ reinterpret_cast<const char *>(glewGetErrorString(status)) };
     spdlog::error("GLEW init failed! error:{}", error_message);
     return -1;
   }

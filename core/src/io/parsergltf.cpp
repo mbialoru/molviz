@@ -2,9 +2,9 @@
 
 using namespace mve::io;
 
-ParserGLTF::ParserGLTF(const char *tp_file) : ParserGLTF(std::filesystem::path(std::string(tp_file))){};
+ParserGLTF::ParserGLTF(const char *tp_file) : ParserGLTF(std::filesystem::path(std::string(tp_file))) {};
 
-ParserGLTF::ParserGLTF(const std::string &tr_file) : ParserGLTF(std::filesystem::path(tr_file)){};
+ParserGLTF::ParserGLTF(const std::string &tr_file) : ParserGLTF(std::filesystem::path(tr_file)) {};
 
 ParserGLTF::ParserGLTF(const std::filesystem::path &tr_file) { parse(tr_file); };
 

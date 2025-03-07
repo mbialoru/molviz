@@ -109,5 +109,9 @@ catch_discover_tests(
 
 if(NOT TARGET all_tests)
   add_custom_target(all_tests)
-  add_dependencies(all_tests tests constexpr_tests relaxed_constexpr_tests)
+  add_dependencies(
+    all_tests
+    tests
+    constexpr_tests
+    relaxed_constexpr_tests)
 endif()

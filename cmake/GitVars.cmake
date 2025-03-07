@@ -11,7 +11,11 @@ if(GIT_FOUND)
       COMMAND git -C ${CMAKE_SOURCE_DIR} branch --show-current
       OUTPUT_VARIABLE GIT_BRANCH
       OUTPUT_STRIP_TRAILING_WHITESPACE)
-    string(SUBSTRING "${GIT_SHA}" 0 8 GIT_SHORT_SHA)
+    string(
+      SUBSTRING "${GIT_SHA}"
+                0
+                8
+                GIT_SHORT_SHA)
     set(GIT_BRANCH ${GIT_BRANCH})
     set(GIT_SHORT_SHA ${GIT_SHORT_SHA})
     message(STATUS "GIT SHA: ${GIT_SHA}")
