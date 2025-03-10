@@ -160,7 +160,7 @@ function(project_package_project)
     URL https://github.com/polysquare/cmake-forward-arguments/archive/8c50d1f956172edb34e95efa52a2d5cb1f686ed2.zip)
   FetchContent_GetProperties(_fargs)
   if(NOT _fargs_POPULATED)
-    FetchContent_Populate(_fargs)
+    FetchContent_MakeAvailable(_fargs)
   endif()
   include("${_fargs_SOURCE_DIR}/ForwardArguments.cmake")
 
