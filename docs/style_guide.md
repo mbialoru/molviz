@@ -1,309 +1,250 @@
-<!-- Taken from https://www.geeksforgeeks.org/naming-convention-in-c/ -->
-<!-- With further modifications -->
-
+Originally from [here](https://www.geeksforgeeks.org/naming-convention-in-c/) later modified with examples and descriptions added. Formatted to Markdown.
 # Rules
-* The class name should be a noun.
++ The class name should be a noun.
 
-* Use upper case letters as word separators, lower case for the rest of the word
-  in the class name.
++ Use upper case letters as word separators, lower case for the rest of the word in the class name.
 
-* The first character in the class name must be upper case, PascalCase style.
++ The first character in the class name must be upper case, `PascalCase` style.
 
-* No underscores (‘_’) are permitted in the class name.
++ No underscores (`_`) are permitted in the class name.
 
-* The private attribute name in class should be prepended with the characters
-  ‘m_’.
++ The private attribute name in class should be prepended with the characters `m_`.
 
-* In a class, place attributes after methods. Place static elements before
-  non-static ones `extern` as well as `virtual` should be declared first. Separate groups of methods or attributes, group by type.
++ In a class, place attributes after methods. Place static elements before non-static ones `extern` as well as `virtual` should be declared first. Separate groups of methods or attributes, group by type.
 
-* When grouping by type, order groups however you see fit, try to keep the same
-  ordering between source/header.
++ When grouping by type, order groups however you see fit, try to keep the same ordering between source and header.
 
-* Source files should contain only one #include clause.
++ Source files should contain only one `#include` clause.
 
-* Header files should separate include clauses grouping ones from standard
-  library and external dependencies. Standard library should come first.
++ Header files should separate include clauses grouping ones from standard library and external dependencies. Standard library should come first.
 
-* Angle brackets are used for not our own includes, quotes however are for our
-  own files.
++ Angle brackets are used for not our own includes, quotes however are for our own files.
 
-* Try to include __only__ header files.
++ Try to include __only__ header files.
 
-* When declaring a method/function in header file do not strip the declaration
-  of variable names. This is to help with IDE autosuggestion.
++ When declaring a method/function in header file do not strip the declaration of variable names. This is to help with IDE autosuggestion.
 
-* After prepending ‘m_’, rest of the name should be snake_case.
++ After prepending `m_`, rest of the name should be `snake_case`.
 
-* Prefix ‘m_’ also precedes other name modifiers. For example, ‘p_’ for
++ Prefix `m_` also precedes other name modifiers. For example, `p_` for
   pointers.
 
-* Each method / function name should begin with a verb, then same rules like for
-  variable names should be followed. This rule does not apply for constructors
-  and destructors for obvious reasons.
++ Each method / function name should begin with a verb, then same rules like for variable names should be followed. This rule does not apply for constructors and destructors for obvious reasons.
 
-* Arguments should be prepended with ‘t_’, rest of the name should follow
-  snake_case. Remaining prefix adding rules add their corresponding part after `t`
++ Arguments should be prepended with `t_`, rest of the name should follow `snake_case`. Remaining prefix adding rules add their corresponding part after `t`
 
-* Optional arguments should be prepended with ‘o_’ rest of the name should
-  follow snake_case.
++ Optional arguments should be prepended with `o_` rest of the name should follow `snake_case`.
 
-* If creating helper-caller function structures and naming helper(s) after
-  caller function, then prepend helper(s) name with `h_`
++ If creating helper-caller function structures and naming helper(s) after caller function, then prepend helper(s) name with `h_`
 
-* The variable name should begin with an alphabet ASCII character, rest should
-  follow snake_case rule.
++ The variable name should begin with an alphabet ASCII character, rest should follow `snake_case` rule.
 
-* Digits may be used in the variable name but only after letter.
++ Digits may be used in the variable name but only after letter.
 
-* No special symbols can be used in variable names except for the
-  underscore(‘_’).
++ No special symbols can be used in variable names except for the
+  underscore (`_`).
 
-* No keywords can be used for variable names.
++ No keywords can be used for variable names.
 
-* Pointer variables should be prepended with ‘p_’ and place the asterisk ‘*’
-  close to the variable name instead of pointer type. This also applies for
-  smart pointers.
++ Pointer variables should be prepended with `p_` and place the asterisk `*` close to the variable name instead of pointer type. This also applies for smart pointers.
 
-* Reference variables should be prepended with ‘r_’. This helps to differentiate
-  between the method returning a modifiable object and the same method returning
-  a non-modifiable object.
++ Reference variables should be prepended with `r_`. This helps to differentiate between the method returning a modifiable object and the same method returning a non-modifiable object.
 
-* Static variables should be prepended with ‘s_’.
++ Static variables should be prepended with `s_`.
 
-* The global constants should be all capital ASCII letters separated with ‘_’.
++ The global constants should be all capital ASCII letters separated with underscore (`_`).
 
-* No special character is allowed in the file name except for underscore (‘_’)
-  or dash (‘-‘).
++ No special character is allowed in the file name except for underscore (`_`) or dash (`-`).
 
-* Avoid initializing multiple variables in one line to avoid common problems with initial value or pointer types
++ Avoid initializing multiple variables in one line to avoid common problems with initial value or pointer types
 
-* The file name should end with the .cc (or .h for headers) extension in the
-  end or should end with the .cpp extension (.hpp for headers).
++ The file name extension should be `.c` for C source files (or `.h` for headers) `.cpp` for C++ source files (`.hpp` for headers or `.ipp` for implementation - more below).
 
-* When separating template code into header and source, you can create
-  implementation in .ipp file if it is necessary, however setups like these
-  can get ugly with include directories in build systems.
++ When separating template code into header and source, you can create implementation in `.ipp` file if it is necessary, however setups like these in build systems can get ugly with include directories.
 
-* Do not use filenames that already exist in /user/include, or any predefined
-  standard header file name.
++ Do not use filenames that already exist in `/user/include`, or any predefined known, standard header file name.
 
 # Illustrations
-* Class
-    Name a class in C++ after what it is and use upper case letters as word
-    separators. The class name should be a noun. For example, ReverseString,
-    Multiply2Numbers. The name should be specific and hint at the functioning of
-    the class without glancing at the body of the class.
++ **Class**
+Name a class in C++ after what it is and use upper case letters as word separators. The class name should be a noun. For example, `ReverseString` or `Multiply2Numbers`. The name should be specific and hint at the functioning of the class without glancing at the body of the class.
 
-* Methods
-    Every method and function performs an action, so the function name
-    should make it clear what it does. For example, WriteDataToFile() is more
-    convenient name than WriteFile().
++ **Methods**
+Every method and function performs an action, so the function name should make it clear what it does. For example, `WriteDataToFile()` is more convenient name than `WriteFile()`.
 
-* Constants
-    Constants should be all capital letters with ‘_’ separators. For example,
-    MAX_INT, TWO_PI, etc.
-
++ **Constants**
+Constants should be all capital letters with underscore (`_`) separators. For example, `MAX_INT` or `TWO_PI`
 # Examples
-* Classes and class attribute names
-    * The class name should be a noun.
-    * Use upper case letters as word separators, lower case for the rest of the
-      word.
-    * The first character in the class name must be upper case.
-    * No underscores (‘_’) are permitted in the class name.
+## Classes and class attribute names
+- The class name should be a noun.
+- Use upper case letters as word separators, lower case for the rest of the word.
+- The first character in the class name must be upper case.
+- No underscores (`_`) are permitted in the class name.
 
-  ```cpp
-  class Rectangle
-  {
-  public:
-    int area;
-    int perimeter;
+```cpp
+class Rectangle
+{
+public:
+  int area;
+  int perimeter;
 
-  private:
-    int m_length;
-    int m_width;
-  };
-  ```
-* Class elements ordering
-  * In a class, place attributes after methods. Place static elements before
-    non-static ones. Separate groups of methods or attributes, group by type.
+private:
+  int m_length;
+  int m_width;
+};
+```
+## Class elements ordering
+In a class, place attributes after methods. Place static elements before non-static ones. Separate groups of methods or attributes, group by type.
 
-  ```cpp
-  class DataProcessor
-  {
-  public:
-    DataProcessor();
+```cpp
+class DataProcessor
+{
+public:
+  DataProcessor();
 
-    void process_data();
-    void package_results();
+  void process_data();
+  void package_results();
 
-    int last_status;
-  private:
-    static constexpr std::size_t S_MAX_DATA_CHUNK_SIZE{ 64000 };
+  int last_status;
 
-    bool validate_parsed_data();
+private:
+  static constexpr std::size_t S_MAX_DATA_CHUNK_SIZE{ 64000 };
 
-    int m_error_code;
-  };
-  ```
+  bool validate_parsed_data();
 
-* Functions and function argument names
+  int m_error_code;
+};
+```
+## Functions and function argument names
+Usually, every function in C++ performs one or more actions, so the name of the function should clearly hint what it does. Each method or function name should begin with a verb. Prefixes are sometimes useful. For example: `get_` to get value (getter) or `set_` to set value (setter).
 
-  Usually, every function in C++ performs one or more actions, so the name of
-  the function should clearly hint what it does. Each method / function name
-  should begin with a verb.
+The same name convention is used as that for the variable/attribute names.
 
-  * Prefixes are sometimes useful. For example,
-    * get_ get value.
-    * set_ set value.
+```cpp
+int get_value();
+int solve_equation();
+```
 
-  The same name convention is used as that for the variable/attribute names.
+Arguments should be prepended with `t_`, rest of the name should follow `snake_case`.
 
-  ```cpp
-  int get_value();
-  int solve_equation();
-  ```
+```cpp
+int connect_to_database(int t_access_mode, std::string t_database_address);
+```
 
-  Arguments should be prepended with ‘t_’, rest of the name should follow snake_case.
+Optional arguments should be prepended with `o_` rest of the name should follow `snake_case`.
 
-  ```cpp
-  int connect_to_database(int t_access_mode, std::string t_database_address);
-  ```
+```cpp
+int open_file(std::string t_filename, std::string to_mode);
+```
 
-  Optional arguments should be prepended with ‘o_’ rest of the name should
-  follow snake_case.
+If creating helper-caller function structures and naming helper(s) after caller function, then prepend helper(s) name with `h_`.
 
-  ```cpp
-  int open_file(std::string t_filename, std::string to_mode);
-  ```
-
-  If creating helper-caller function structures and naming helper(s) after
-  caller function, then prepend helper(s) name with ‘h_’.
-
-  ```cpp
-  void h_conduct_operation(double t_a, double t_b);
-  void conduct_operation(double t_a, double t_b)
-  {
-    /* code */
-    h_conduct_operation(t_a, t_b);
-    /* code */
-  }
-
-* Variables
-
-  When the variables are declared dynamically using the new keyword or if the variables are declared as class attributes then they
-  take memory from the heap and when the variables are created in a C++ program, the memory is allocated from the program stack.
-
-  * The variable name should begin with an alphabet ASCII character, rest
-    should follow snake_case rule.
-  * Digits may be used in the variable name but only after letter.
-  * No special symbols can be used in variable names except for the
-    underscore(‘_’).
-  * No keywords can be used for variable names.
-
-  ```cpp
-  int total_cost;
-  int length;
-  ```
-
-  Pointer variables should be prepended with ‘p_’ and place the asterisk ‘*’
-  close to the variable name instead of pointer type. This also applies for
-  smart pointers.
-
-  ```cpp
-  int *p_name;
-  int *p_age, address; // Here only p_age is a pointer variable !
-  std::unique_ptr<double> p_length;
-  ```
-
-  Reference variables should be prepended with ‘r_’. This helps to
-  differentiate between the method returning a modifiable object and the same
-  method returning a non-modifiable object.
-
-  ```cpp
-  int weight = 8;
-  int& r_weight = weight;
-  ```
-
-  Static variables should be prepended with ‘s_’.
-  ```cpp
-  static int s_count;
-  ```
-
-  Avoid initializing multiple variables in one line to avoid common problems
-  with initial value or pointer types.
-  ```cpp
-  int* a, b, c; // only a is a pointer !
-  int a, b, c = 0; // only c is initialized !
-  ```
-
-* Constants
-
-  The global constants should be all capital letters separated with ‘_’.
-  ```cpp
-  const double TWO_PI = 6.28318531;
-  ```
-
-* Includes
-  * Source files should contain only one include clause.
-  * Header files should separate include clauses grouping ones from standard
-    library and external dependencies. Standard library should come first.
-  * Angle brackets are used for not our own includes, quotes however are for our
-    own files.
-  * Try to include __only__ header files.
-
-  ```cpp
-  // file: my_header.hpp
-  #ifndef MY_HEADER_HPP
-  #define MY_HEADER_HPP
-
-  #pragma once
-
-  #include <iostream>
-  #include <vector>
-
-  #include <fmt/core.h>
-
+```cpp
+void h_conduct_operation(double t_a, double t_b);
+void conduct_operation(double t_a, double t_b)
+{
   /* code */
-
-  #endif//MY_HEADER_HPP
-  ```
-
-  ```cpp
-  // file: my_source.cpp
-  #include "my_header.hpp"
-
+  h_conduct_operation(t_a, t_b);
   /* code */
-  ```
-* File naming
-    * No special character is allowed in the file name except for underscore
-      (‘_’) and dash (‘-‘).
-    * The file name should end with the .c / .cc (or .h for headers) extension
-      in the end or should end with the .cpp extension (.hpp for headers).
-    * When separating template class into header and source, you can create
-      implementation in .ipp file if it is necessary, however setups like these
-      can get ugly with include directories in build systems.
-    * Do not use filenames that already exist in /user/include. or any
-      predefined header file name.
+}
+```
+## Variables
+When the variables are declared dynamically using the new keyword or if the variables are declared as class attributes then they take memory from the heap and when the variables are created in a C++ program, the memory is allocated from the program stack.
 
-  ```
-  helloworld.c        // Valid
++ The variable name should begin with an alphabet ASCII character, rest should follow `snake_case` rule.
++ Digits may be used in the variable name but only after letter.
++ No special symbols can be used in variable names except for the underscore (`_`).
++ No keywords can be used for variable names.
 
-  helloworld.cc       // Valid
+```cpp
+int total_cost;
+int length;
+```
 
-  helloworld.h        // Valid
+Pointer variables should be prepended with `p_` and place the asterisk `*` close to the variable name instead of pointer type. This also applies for smart pointers.
 
-  hello_world.cpp     // Valid
+```cpp
+int *p_name;
+int *p_age, address; // Here only p_age is a pointer variable !
+std::unique_ptr<double> p_length;
+```
 
-  hello_world.ipp     // Valid
+Reference variables should be prepended with `r_`. This helps to differentiate between the method returning a modifiable object and the same method returning a non-modifiable object.
 
-  hello_world.hpp     // Valid
+```cpp
+int weight = 8;
+int& r_weight = weight;
+```
 
-  hello-world.cpp     // Valid
+Static variables should be prepended with `s_`.
 
-  hel-lo_world.cpp    // Valid
+```cpp
+static int s_count;
+```
 
-  hello* world.cpp    // Not Valid
+Avoid initializing multiple variables in one line to avoid common problems with initial value or pointer types.
+```cpp
+int* a, b, c; // only a is a pointer !
+int a, b, c = 0; // only c is initialized !
+```
+## Constants
+The global constants should be all capital letters separated with underscore (`_`).
 
-  iostream.cpp        // Not Valid
-  ```
+```cpp
+const double TWO_PI = 6.28318531;
+```
+## Includes
++ Source files should contain only one include clause.
++ Header files should separate include clauses grouping ones from standard library and external dependencies. Standard library should come first.
++ Angle brackets are used for not our own includes, quotes however are for our own files.
++ Try to include __only__ header files.
+
+```cpp
+// file: my_header.hpp
+#ifndef MY_HEADER_HPP
+#define MY_HEADER_HPP
+
+#pragma once
+
+#include <iostream>
+#include <vector>
+
+#include <fmt/core.h>
+
+/* code */
+
+#endif//MY_HEADER_HPP
+```
+
+```cpp
+// file: my_source.cpp
+#include "my_header.hpp"
+
+/* code */
+```
+## File naming
++ No special character is allowed in the file name except for underscore (`_`) and dash (`-`).
++ The file name extension should be `.c` for C source files (or `.h` for headers) `.cpp` for C++ source files (`.hpp` for headers or `.ipp` for implementation - more below)
++ When separating template code into header and source, you can create implementation in `.ipp` file if it is necessary, however setups like these in build systems can get ugly with include directories.
++ Do not use filenames that already exist in `/user/include`, or any predefined known, standard header file name.
+
+```
+helloworld.c        // Valid
+
+helloworld.cc       // Valid
+
+helloworld.h        // Valid
+
+hello_world.cpp     // Valid
+
+hello_world.ipp     // Valid
+
+hello_world.hpp     // Valid
+
+hello-world.cpp     // Valid
+
+hel-lo_world.cpp    // OK, but why :(
+
+hello+ world.cpp    // Not Valid
+
+iostream.cpp        // Not Valid
+```
