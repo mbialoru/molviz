@@ -9,7 +9,7 @@ function(project_setup_dependencies)
   # already been provided to us by a parent project
 
   if(NOT TARGET fmtlib::fmtlib)
-    cpmaddpackage("gh:fmtlib/fmt#10.1.1")
+    cpmaddpackage("gh:fmtlib/fmt#11.1.4")
   endif()
 
   if(NOT TARGET spdlog::spdlog)
@@ -17,25 +17,25 @@ function(project_setup_dependencies)
       GITHUB_REPOSITORY
       gabime/spdlog
       VERSION
-      1.12.0
+      1.15.1
       OPTIONS
       "SPDLOG_FMT_EXTERNAL ON")
   endif()
 
   if(NOT TARGET Catch2::Catch2WithMain)
-    cpmaddpackage("gh:catchorg/Catch2#v3.5.0")
+    cpmaddpackage("gh:catchorg/Catch2#v3.8.0")
   endif()
 
   if(NOT TARGET CLI11::CLI11)
-    cpmaddpackage("gh:CLIUtils/CLI11#v2.3.2")
+    cpmaddpackage("gh:CLIUtils/CLI11#v2.5.0")
   endif()
 
-  if(NOT TARGET SDL2::SDL2)
-    cpmaddpackage("gh:libsdl-org/SDL#release-2.28.5")
+  if(NOT TARGET SDL3::SDL3)
+    cpmaddpackage("gh:libsdl-org/SDL#release-3.2.8")
   endif()
 
   if(NOT TARGET imgui)
-    cpmaddpackage("gh:ocornut/imgui#v1.90")
+    cpmaddpackage("gh:ocornut/imgui#v1.91.8")
 
     add_library(
       imgui STATIC
@@ -49,11 +49,11 @@ function(project_setup_dependencies)
     target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends)
     target_compile_definitions(imgui PUBLIC -DIMGUI_DISABLE_OBSOLETE_FUNCTIONS)
 
-    target_link_system_libraries(imgui PRIVATE SDL2::SDL2)
+    target_link_system_libraries(imgui PRIVATE SDL3::SDL3)
   endif()
 
   if(NOT TARGET glm::glm)
-    cpmaddpackage("gh:g-truc/glm#0.9.9.8")
+    cpmaddpackage("gh:g-truc/glm#1.0.1")
   endif()
 
   if(NOT TARGET nlohmann_json::nlohmann_json)

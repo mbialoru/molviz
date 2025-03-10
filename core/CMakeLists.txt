@@ -17,7 +17,7 @@ target_link_system_libraries(
   GLEW::GLEW
   glm::glm
   nlohmann_json::nlohmann_json
-  SDL2
+  SDL3::SDL3
   spdlog::spdlog)
 
 target_link_libraries(Core PRIVATE project_options project_warnings)

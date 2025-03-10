@@ -15,7 +15,7 @@ if(NOT TARGET ${CMAKE_PROJECT_NAME})
     imgui
     nlohmann_json::nlohmann_json
     OpenGL::OpenGL
-    SDL2
+    SDL3::SDL3
     spdlog::spdlog)
 
   target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "${CMAKE_BINARY_DIR}/app/include")

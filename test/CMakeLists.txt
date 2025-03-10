@@ -23,7 +23,7 @@ if(NOT TARGET tests)
     GLEW::GLEW
     glm::glm
     nlohmann_json::nlohmann_json
-    SDL2
+    SDL3::SDL3
     spdlog::spdlog
     OpenGL::OpenGL)
 
