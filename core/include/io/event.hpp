@@ -21,7 +21,7 @@ public:
   explicit Event(EventType t_type);
   virtual ~Event() = default;
 
-  [[nodiscard]] EventType virtual get_type() const = 0;
+  [[nodiscard]] EventType get_type() const;
 
 protected:
   EventType m_type;
