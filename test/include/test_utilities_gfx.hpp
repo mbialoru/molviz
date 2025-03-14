@@ -4,7 +4,7 @@
 #pragma once
 
 #include <GL/glew.h>
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <catch2/catch_test_macros.hpp>
 #include <spdlog/spdlog.h>
 

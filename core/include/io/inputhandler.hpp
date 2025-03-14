@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <atomic>
 #include <spdlog/spdlog.h>
 #include <thread>
