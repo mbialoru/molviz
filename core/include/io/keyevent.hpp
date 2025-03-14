@@ -13,6 +13,8 @@ public:
   KeyEvent(int t_key_code, EventType t_type);
   ~KeyEvent() override = default;
 
+  [[nodiscard]] int get_code() const;
+
 private:
   int m_key_code;
 };
