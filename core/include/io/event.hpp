@@ -8,11 +8,11 @@
 namespace mve::io {
 
 enum class EventType : std::uint8_t {
-  KEY_PRESSED,
-  KEY_RELEASED,
-  MOUSE_MOVED,
-  MOUSE_BUTTON_PRESSED,
-  MOUSE_BUTTON_RELEASED
+  KEY_PRESS,
+  KEY_RELEASE,
+  KEY_CONTINUOUS,
+  KEY_DOUBLE,
+  MOUSE_MOVE,
 };
 
 class Event
