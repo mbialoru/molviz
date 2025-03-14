@@ -52,6 +52,22 @@ private:
   std::string m_error_message;
 };
 
+class InvalidEvent : public std::exception
+{
+public:
+  InvalidEvent() : m_error_message("function not yet implemented") {}
+  InvalidEvent(const std::string t_function_name) : InvalidEvent()
+  {
+    spdlog::error("{} {}", m_error_message, t_function_name);
+  }
+  InvalidEvent(const char *tp_function_name) : InvalidEvent(std::string(tp_function_name)) {}
+
+  const char *what() const noexcept { return m_error_message.c_str(); }
+
+private:
+  std::string m_error_message;
+};
+
 }// namespace mve
 
 #endif// EXCEPTIONS_HPP
