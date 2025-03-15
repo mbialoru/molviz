@@ -9,6 +9,8 @@ VertexBuffer::VertexBuffer(std::vector<Vertex> &tr_vertices)
   glBufferData(GL_ARRAY_BUFFER, tr_vertices.size() * sizeof(Vertex), tr_vertices.data(), GL_STATIC_DRAW);
 };
 
+VertexBuffer::~VertexBuffer() { cleanup(); }
+
 void VertexBuffer::bind() { glBindBuffer(GL_ARRAY_BUFFER, id); }
 
 void VertexBuffer::unbind() { glBindBuffer(GL_ARRAY_BUFFER, 0); }
