@@ -4,6 +4,12 @@ include(${Catch2_SOURCE_DIR}/extras/Catch.cmake)
 
 # ---- Tests ----
 
+file(
+  GLOB
+  TEST_UTILITIES
+  CONFIGURE_DEPENDS
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/test_utilities_*.cpp)
+
 if(NOT TARGET unit_tests)
   file(
     GLOB
@@ -11,7 +17,7 @@ if(NOT TARGET unit_tests)
     CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/unit/test_*.cpp)
 
-  add_executable(unit_tests ${UNIT_TESTS_SRCS})
+  add_executable(unit_tests ${UNIT_TESTS_SRCS} ${TEST_UTILITIES})
   target_include_directories(unit_tests PRIVATE include)
   target_link_libraries(unit_tests PRIVATE ${CMAKE_PROJECT_NAME}::project_warnings
                                            ${CMAKE_PROJECT_NAME}::project_options ${CMAKE_PROJECT_NAME}::Core)
@@ -59,7 +65,7 @@ if(NOT TARGET integration_tests)
     CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/integration/test_*.cpp)
 
-  add_executable(integration_tests ${INTEGRATION_TESTS_SRCS})
+  add_executable(integration_tests ${INTEGRATION_TESTS_SRCS} ${TEST_UTILITIES})
   target_include_directories(integration_tests PRIVATE include)
   target_link_libraries(integration_tests PRIVATE ${CMAKE_PROJECT_NAME}::project_warnings
                                                   ${CMAKE_PROJECT_NAME}::project_options ${CMAKE_PROJECT_NAME}::Core)
