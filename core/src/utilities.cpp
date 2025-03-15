@@ -79,8 +79,5 @@ bool mve::file_exists(const std::string &tr_file)
 bool mve::file_exists(const std::filesystem::path &tr_file,
   std::filesystem::file_status t_status = std::filesystem::file_status{})
 {
-  if (std::filesystem::status_known(t_status) ? std::filesystem::exists(t_status) : std::filesystem::exists(tr_file)) {
-    return true;
-  }
-  return false;
+  return std::filesystem::status_known(t_status) ? std::filesystem::exists(t_status) : std::filesystem::exists(tr_file);
 }

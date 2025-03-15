@@ -1,4 +1,5 @@
 #include "test_utilities_gfx.hpp"
+#include <SDL3/SDL_video.h>
 
 // create dummy zero-size window for valid opengl context
 std::pair<SDL_Window *, SDL_GLContext> create_dummy_opengl_context()
@@ -11,7 +12,7 @@ std::pair<SDL_Window *, SDL_GLContext> create_dummy_opengl_context()
 
   // create dummy hidden SDL window for a dummy OpenGL context
   SDL_WindowFlags window_flags{ static_cast<SDL_WindowFlags>(SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN) };
-  SDL_Window *p_window{ SDL_CreateWindow(nullptr, 0, 0, 0, 0, window_flags) };
+  SDL_Window *p_window{ SDL_CreateWindow(nullptr, 0, 0, window_flags) };
   SDL_GLContext context{ SDL_GL_CreateContext(p_window) };
 
   // init GLEW after OpenGL context - Missing GL version error otherwise
@@ -36,8 +37,7 @@ std::pair<SDL_Window *, SDL_GLContext> create_real_opengl_context()
 
   // create real visible SDL window for OpenGL context
   SDL_WindowFlags window_flags{ static_cast<SDL_WindowFlags>(SDL_WINDOW_OPENGL) };
-  SDL_Window *p_window{ SDL_CreateWindow(
-    nullptr, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 800, window_flags) };
+  SDL_Window *p_window{ SDL_CreateWindow(nullptr, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_flags) };
   SDL_GLContext context{ SDL_GL_CreateContext(p_window) };
 
   // init GLEW after OpenGL context - Missing GL version error otherwise
@@ -53,7 +53,7 @@ std::pair<SDL_Window *, SDL_GLContext> create_real_opengl_context()
 // delete context and destroy window
 void cleanup_opengl_context(SDL_Window *tp_window, SDL_GLContext t_context)
 {
-  SDL_GL_DeleteContext(t_context);
+  SDL_GL_DestroyContext(t_context);
   SDL_DestroyWindow(tp_window);
   SDL_Quit();
 }
