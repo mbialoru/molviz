@@ -1,51 +1,51 @@
 {
-	"name": "C++",
-	"build": {
-		"dockerfile": "Dockerfile",
-		"args": {
-			"VARIANT": "sid-slim",
-			"GCC_VER": "14",
-			"LLVM_VER": "19"
-		}
-	},
-	"customizations": {
-		"vscode": {
-			"settings": {
-				"cmake.configureOnOpen": true,
-				"editor.formatOnSave": true
-			},
-			"extensions": [
-				"ms-vscode.cpptools",
-				"ms-vscode.cmake-tools",
-				"twxs.cmake",
-				"ms-vscode.cpptools-themes",
-				"cschlosser.doxdocgen",
-				"eamodio.gitlens",
-				"ms-python.python",
-				"ms-python.vscode-pylance",
-				"mutantdino.resourcemonitor",
-				"cheshirekow.cmake-format",
-				"xaver.clang-format",
-				"GeForceLegend.vscode-glsl",
-				"trunk.io"
-			]
-		}
-	},
-	"remoteEnv": {
-		"DISPLAY": ":0"
-	},
-	"runArgs": [
-		"--cap-add=SYS_PTRACE",
-		"--security-opt",
-		"seccomp=unconfined",
-		"--net=host",
-		"--ipc=host"
-	],
-	"remoteUser": "vscode",
-	"workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind,consistency=delegated",
-	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-	"features": {
-		"ghcr.io/devcontainers/features/git:1": {},
-		"ghcr.io/devcontainers/features/git-lfs:1": {}
-	}
+  "name": "C++",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      "VARIANT": "sid-slim",
+      "GCC_VER": "14",
+      "LLVM_VER": "19"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "cmake.configureOnOpen": true,
+        "editor.formatOnSave": true
+      },
+      "extensions": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cmake-tools",
+        "twxs.cmake",
+        "ms-vscode.cpptools-themes",
+        "cschlosser.doxdocgen",
+        "eamodio.gitlens",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "mutantdino.resourcemonitor",
+        "cheshirekow.cmake-format",
+        "xaver.clang-format",
+        "GeForceLegend.vscode-glsl",
+        "trunk.io"
+      ]
+    }
+  },
+  "remoteEnv": {
+    "DISPLAY": ":0"
+  },
+  "runArgs": [
+    "--cap-add=SYS_PTRACE",
+    "--security-opt",
+    "seccomp=unconfined",
+    "--net=host",
+    "--ipc=host"
+  ],
+  "remoteUser": "vscode",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind,consistency=delegated",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/git-lfs:1": {}
+  }
 }

@@ -60,4 +60,8 @@ function(project_setup_dependencies)
     cpmaddpackage("gh:nlohmann/json#v3.11.3")
   endif()
 
+  if(NOT TARGET Format)
+    cpmaddpackage("gh:TheLartians/Format.cmake@1.8.3")
+  endif()
+
 endfunction()
