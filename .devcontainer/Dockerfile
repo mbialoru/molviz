@@ -140,4 +140,7 @@ RUN echo "alias cd='HOME=/workspaces/molviz cd'" >> ~/.bashrc
 RUN echo "alias l='ls -a'" >> ~/.bashrc
 RUN echo "alias ll='ls -alFh'" >> ~/.bashrc
 
+# Add gdb settings
+RUN echo "set confirm off" >> ~/.gdbinit
+
 CMD ["/bin/bash"]

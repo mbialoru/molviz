@@ -87,15 +87,15 @@ int main(int argc, char **argv)
   ImGui_ImplOpenGL3_Init(glsl_version);
 
   // our application state
-  // TODO: separate struct for storing context information
+  // TODO: separate structs for storing context information
   ImVec4 clear_color = ImVec4(0.5F, 0.0F, 1.0F, 1.0F);
 
   spdlog::debug("imgui configured");
 
-  std::filesystem::path model_fragment_shader{ "../resources/shaders/default.frag" };
-  std::filesystem::path model_vertex_shader{ "../resources/shaders/default.vert" };
+  std::filesystem::path fragment_shader{ "../resources/shaders/default.frag" };
+  std::filesystem::path vertex_shader{ "../resources/shaders/default.vert" };
 
-  Shader shader_program{ model_vertex_shader, model_fragment_shader };
+  Shader shader_program{ vertex_shader, fragment_shader };
   shader_program.activate();
 
   glm::vec4 light_color{ 0.5F, 0.5F, 0.5F, 0.5F };
@@ -110,6 +110,7 @@ int main(int argc, char **argv)
 
   // clipping of overlapping vertices, depth buffer or "z buffer"
   glEnable(GL_DEPTH_TEST);
+
   // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);// wireframe
 
   // create camera
@@ -124,6 +125,7 @@ int main(int argc, char **argv)
 
   // main loop
   bool done = false;
+
   while (!done) {
     last_frametime = this_frametime;
     this_frametime = SDL_GetTicks();
@@ -147,12 +149,12 @@ int main(int argc, char **argv)
       camera.handle_inputs(event);
     }
 
-    // Start the Dear ImGui frame
+    // start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
 
-    // Rendering
+    // handle viewport content rendering
     ImGui::Render();
     glViewport(0, 0, static_cast<int>(io.DisplaySize.x), static_cast<int>(io.DisplaySize.y));
     glClearColor(
@@ -169,7 +171,7 @@ int main(int argc, char **argv)
     if (this_frametime - last_frametime < 1000 / 60) SDL_Delay(1000 / 60 - this_frametime + last_frametime);
   }
 
-  // Cleanup
+  // cleanup
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplSDL2_Shutdown();
   ImGui::DestroyContext();
