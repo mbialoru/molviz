@@ -18,17 +18,17 @@ class Shader
 {
 public:
   Shader(const char *tp_vertex_shader, const char *tp_fragment_shader);
-  Shader(const std::string t_vertex_shader, const std::string t_fragment_shader);
-  Shader(const std::filesystem::path t_vertex_shader, const std::filesystem::path t_fragment_shader);
+  Shader(const std::string &tr_vertex_shader, const std::string &tr_fragment_shader);
+  Shader(const std::filesystem::path &tr_vertex_shader, const std::filesystem::path &tr_fragment_shader);
   ~Shader();
 
-  void activate();
-  void cleanup();
+  void activate() const;
+  void cleanup() const;
 
   GLuint id;
 
 private:
-  void compile_errors(GLuint t_shader, const ShaderType t_type);
+  static void compile_errors(GLuint t_shader, const ShaderType t_type);
 };
 
 }// namespace Molviz::gfx

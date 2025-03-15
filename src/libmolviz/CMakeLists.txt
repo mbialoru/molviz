@@ -11,6 +11,7 @@ add_library(${CMAKE_PROJECT_NAME}::lib${CMAKE_PROJECT_NAME} ALIAS lib${CMAKE_PRO
 set_target_properties(lib${CMAKE_PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX PREFIX "")
 
 add_subdirectory(gfx)
+add_subdirectory(geo)
 
 target_link_system_libraries(
   lib${CMAKE_PROJECT_NAME}

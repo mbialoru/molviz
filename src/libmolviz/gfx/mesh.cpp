@@ -24,12 +24,12 @@ void Mesh::draw(Shader &tr_shader, Camera &tr_camera)
   tr_shader.activate();
   vertex_array.bind();
 
-  glUniform3f(glGetUniformLocation(tr_shader.id, "t_camera_position"),
+  glUniform3f(glGetUniformLocation(tr_shader.id, "u_camera_position"),
     tr_camera.position.x,
     tr_camera.position.y,
     tr_camera.position.z);
 
-  tr_camera.export_matrix(tr_shader, "camera_matrix");
+  tr_camera.export_matrix(tr_shader, "u_camera_matrix");
 
   glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 }

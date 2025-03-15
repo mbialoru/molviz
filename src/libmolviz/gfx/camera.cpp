@@ -26,88 +26,79 @@ void Camera::export_matrix(Shader &t_shader, const char *tp_uniform)
 void Camera::handle_inputs(SDL_Event &tr_event)
 {
   if (tr_event.type == SDL_KEYDOWN) {
-    std::string message{ "Press: " };
+    std::string message{ "press: " };
     switch (tr_event.key.keysym.sym) {
     case SDLK_w:
       message += "W";
-      spdlog::debug(message);
       position += speed * orientation;
       break;
 
     case SDLK_s:
       message += "S";
-      spdlog::debug(message);
       position -= speed * orientation;
       break;
 
     case SDLK_a:
       message += "A";
-      spdlog::debug(message);
       position -= speed * glm::normalize(glm::cross(orientation, up));
       break;
 
     case SDLK_d:
       message += "D";
-      spdlog::debug(message);
       position += speed * glm::normalize(glm::cross(orientation, up));
       break;
 
     case SDLK_SPACE:
       message += "SPACE";
-      spdlog::debug(message);
       position += speed * up;
       break;
 
     case SDLK_LCTRL:
       message += "LCTRL";
-      spdlog::debug(message);
       position -= speed * up;
       break;
 
     case SDLK_LSHIFT:
       message += "LSHIFT";
-      spdlog::debug(message);
       speed = 0.4f;
       break;
     }
+
+    spdlog::debug(message);
+
   } else {
-    std::string message{ "Release: " };
+    std::string message{ "release: " };
     switch (tr_event.key.keysym.sym) {
     case SDLK_w:
       message += "W";
-      spdlog::debug(message);
       break;
 
     case SDLK_s:
       message += "S";
-      spdlog::debug(message);
       break;
 
     case SDLK_a:
       message += "A";
-      spdlog::debug(message);
       break;
 
     case SDLK_d:
       message += "D";
-      spdlog::debug(message);
       break;
 
     case SDLK_SPACE:
       message += "SPACE";
-      spdlog::debug(message);
       break;
 
     case SDLK_LCTRL:
       message += "LCTRL";
-      spdlog::debug(message);
       break;
 
     case SDLK_LSHIFT:
       message += "LSHIFT";
-      spdlog::debug(message);
       speed = 0.1f;
       break;
     }
+
+    spdlog::debug(message);
   }
 }
