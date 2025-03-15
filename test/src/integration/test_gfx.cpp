@@ -9,7 +9,6 @@
 #include "gfx/vertexbuffer.hpp"
 #include "io/parsergltf.hpp"
 
-// test cases
 TEST_CASE("ElementBuffer valid creation and cleanup", "[ElementBuffer, EBO]")
 {
   using namespace mve::gfx;
