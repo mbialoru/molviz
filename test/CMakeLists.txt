@@ -4,20 +4,20 @@ include(${Catch2_SOURCE_DIR}/extras/Catch.cmake)
 
 # ---- Tests ----
 
-if(NOT TARGET tests)
+if(NOT TARGET unit_tests)
   file(
     GLOB
-    TESTS_SRCS
+    UNIT_TESTS_SRCS
     CONFIGURE_DEPENDS
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/test_*.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/unit/test_*.cpp)
 
-  add_executable(tests ${TESTS_SRCS})
-  target_include_directories(tests PRIVATE include)
-  target_link_libraries(tests PRIVATE ${CMAKE_PROJECT_NAME}::project_warnings ${CMAKE_PROJECT_NAME}::project_options
-                                      ${CMAKE_PROJECT_NAME}::Core)
+  add_executable(unit_tests ${UNIT_TESTS_SRCS})
+  target_include_directories(unit_tests PRIVATE include)
+  target_link_libraries(unit_tests PRIVATE ${CMAKE_PROJECT_NAME}::project_warnings
+                                           ${CMAKE_PROJECT_NAME}::project_options ${CMAKE_PROJECT_NAME}::Core)
 
   target_link_system_libraries(
-    tests
+    unit_tests
     PRIVATE
     Catch2::Catch2WithMain
     GLEW::GLEW
@@ -29,9 +29,9 @@ if(NOT TARGET tests)
 
   if(WIN32 AND BUILD_SHARED_LIBS)
     add_custom_command(
-      TARGET tests
+      TARGET unit_tests
       PRE_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:tests> $<TARGET_FILE_DIR:tests>
+      COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:unit_tests> $<TARGET_FILE_DIR:unit_tests>
       COMMAND_EXPAND_LISTS)
   endif()
 endif()
@@ -40,7 +40,7 @@ endif()
 # can modify the unittests. Set TEST_PREFIX
 # to whatever you want, or use different for different binaries
 catch_discover_tests(
-  tests
+  unit_tests
   TEST_PREFIX
   "unittests."
   REPORTER
@@ -49,6 +49,51 @@ catch_discover_tests(
   .
   OUTPUT_PREFIX
   "unittests."
+  OUTPUT_SUFFIX
+  .xml)
+
+if(NOT TARGET integration_tests)
+  file(
+    GLOB
+    INTEGRATION_TESTS_SRCS
+    CONFIGURE_DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/integration/test_*.cpp)
+
+  add_executable(integration_tests ${INTEGRATION_TESTS_SRCS})
+  target_include_directories(integration_tests PRIVATE include)
+  target_link_libraries(integration_tests PRIVATE ${CMAKE_PROJECT_NAME}::project_warnings
+                                                  ${CMAKE_PROJECT_NAME}::project_options ${CMAKE_PROJECT_NAME}::Core)
+
+  target_link_system_libraries(
+    integration_tests
+    PRIVATE
+    Catch2::Catch2WithMain
+    GLEW::GLEW
+    glm::glm
+    nlohmann_json::nlohmann_json
+    SDL3::SDL3
+    spdlog::spdlog
+    OpenGL::OpenGL)
+
+  if(WIN32 AND BUILD_SHARED_LIBS)
+    add_custom_command(
+      TARGET integration_tests
+      PRE_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:integration_tests> $<TARGET_FILE_DIR:integration_tests>
+      COMMAND_EXPAND_LISTS)
+  endif()
+endif()
+
+catch_discover_tests(
+  integration_tests
+  TEST_PREFIX
+  "integrationtests."
+  REPORTER
+  XML
+  OUTPUT_DIR
+  .
+  OUTPUT_PREFIX
+  "integrationtests."
   OUTPUT_SUFFIX
   .xml)
 
@@ -111,7 +156,8 @@ if(NOT TARGET all_tests)
   add_custom_target(all_tests)
   add_dependencies(
     all_tests
-    tests
+    unit_tests
+    integration_tests
     constexpr_tests
     relaxed_constexpr_tests)
 endif()
