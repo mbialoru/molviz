@@ -38,7 +38,6 @@ function(project_setup_dependencies)
     add_library(imgui STATIC
     ${imgui_SOURCE_DIR}/imgui.cpp
     ${imgui_SOURCE_DIR}/imgui_draw.cpp
-    ${imgui_SOURCE_DIR}/imgui_demo.cpp
     ${imgui_SOURCE_DIR}/imgui_widgets.cpp
     ${imgui_SOURCE_DIR}/imgui_tables.cpp
 
@@ -50,6 +49,10 @@ function(project_setup_dependencies)
     target_compile_definitions(imgui PUBLIC -DIMGUI_DISABLE_OBSOLETE_FUNCTIONS)
 
     target_link_system_libraries(imgui PRIVATE SDL2::SDL2)
+  endif()
+
+  if(NOT TARGET glm::glm)
+    cpmaddpackage("gh:g-truc/glm#0.9.9.8")
   endif()
 
 endfunction()
