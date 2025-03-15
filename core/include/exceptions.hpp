@@ -4,8 +4,8 @@
 #pragma once
 
 #include <spdlog/spdlog.h>
-#include <stdexcept>
 #include <string>
+#include <utility>
 
 namespace mve {
 
@@ -13,13 +13,31 @@ class NotImplementedException : public std::exception
 {
 public:
   NotImplementedException() : m_error_message("function not yet implemented") {}
-  NotImplementedException(const std::string t_function_name) : NotImplementedException()
+  explicit NotImplementedException(const std::string &tr_function_name) : NotImplementedException()
   {
-    spdlog::error("{} {}", m_error_message, t_function_name);
+    spdlog::error("{} {}", m_error_message, tr_function_name);
   }
-  NotImplementedException(const char *tp_function_name) : NotImplementedException(std::string(tp_function_name)) {}
+  explicit NotImplementedException(const char *tp_function_name)
+    : NotImplementedException(std::string(tp_function_name))
+  {}
 
-  const char *what() const noexcept { return m_error_message.c_str(); }
+  [[nodiscard]] const char *what() const noexcept override { return m_error_message.c_str(); }
+
+private:
+  std::string m_error_message;
+};
+
+class InvalidEvent : public std::exception
+{
+public:
+  InvalidEvent() : m_error_message("invalid input event type") {}
+  explicit InvalidEvent(std::string t_event_type) : InvalidEvent()
+  {
+    spdlog::error("{} {}", m_error_message, t_event_type);
+  }
+  explicit InvalidEvent(const char *tp_event_type) : InvalidEvent(std::string(tp_event_type)) {}
+
+  [[nodiscard]] const char *what() const noexcept override { return m_error_message.c_str(); }
 
 private:
   std::string m_error_message;
@@ -28,10 +46,13 @@ private:
 class RuntimeErrorLogged : public std::exception
 {
 public:
-  RuntimeErrorLogged(const std::string t_message) : m_error_message(t_message) { spdlog::error("{}", m_error_message); }
-  RuntimeErrorLogged(const char *tp_message) : RuntimeErrorLogged(std::string(tp_message)) {}
+  explicit RuntimeErrorLogged(std::string t_message) : m_error_message(std::move(t_message))
+  {
+    spdlog::error("{}", m_error_message);
+  }
+  explicit RuntimeErrorLogged(const char *tp_message) : RuntimeErrorLogged(std::string(tp_message)) {}
 
-  const char *what() const noexcept { return m_error_message.c_str(); }
+  [[nodiscard]] const char *what() const noexcept override { return m_error_message.c_str(); }
 
 private:
   std::string m_error_message;
@@ -40,13 +61,13 @@ private:
 class InvalidArgumentLogged : public std::exception
 {
 public:
-  InvalidArgumentLogged(const std::string t_message) : m_error_message(t_message)
+  explicit InvalidArgumentLogged(std::string t_message) : m_error_message(std::move(t_message))
   {
     spdlog::error("{}", m_error_message);
   }
-  InvalidArgumentLogged(const char *tp_message) : InvalidArgumentLogged(std::string(tp_message)) {}
+  explicit InvalidArgumentLogged(const char *tp_message) : InvalidArgumentLogged(std::string(tp_message)) {}
 
-  const char *what() const noexcept { return m_error_message.c_str(); }
+  [[nodiscard]] const char *what() const noexcept override { return m_error_message.c_str(); }
 
 private:
   std::string m_error_message;
