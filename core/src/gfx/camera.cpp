@@ -36,25 +36,25 @@ void Camera::handle_inputs_keyboard(const SDL_Event &tr_event)
 {
   std::string message;
 
-  if (tr_event.type == SDL_KEYDOWN) {
+  if (tr_event.type == SDL_EVENT_KEY_DOWN) {
     message += "(K) key down: ";
-    switch (tr_event.key.keysym.sym) {
-    case SDLK_w:
+    switch (tr_event.key.key) {
+    case SDLK_W:
       message += "W";
       position += speed * orientation;
       break;
 
-    case SDLK_s:
+    case SDLK_S:
       message += "S";
       position -= speed * orientation;
       break;
 
-    case SDLK_a:
+    case SDLK_A:
       message += "A";
       position -= speed * glm::normalize(glm::cross(orientation, up));
       break;
 
-    case SDLK_d:
+    case SDLK_D:
       message += "D";
       position += speed * glm::normalize(glm::cross(orientation, up));
       break;
@@ -74,22 +74,22 @@ void Camera::handle_inputs_keyboard(const SDL_Event &tr_event)
       speed = 0.4F;
       break;
     }
-  } else if (tr_event.type == SDL_KEYUP) {
+  } else if (tr_event.type == SDL_EVENT_KEY_UP) {
     message += "(K) key up: ";
-    switch (tr_event.key.keysym.sym) {
-    case SDLK_w:
+    switch (tr_event.key.key) {
+    case SDLK_W:
       message += "W";
       break;
 
-    case SDLK_s:
+    case SDLK_S:
       message += "S";
       break;
 
-    case SDLK_a:
+    case SDLK_A:
       message += "A";
       break;
 
-    case SDLK_d:
+    case SDLK_D:
       message += "D";
       break;
 
@@ -113,7 +113,7 @@ void Camera::handle_inputs_keyboard(const SDL_Event &tr_event)
 void Camera::handle_inputs_mouse(const SDL_Event &tr_event, SDL_Window *tp_window)
 {
   std::string message;
-  if (tr_event.type == SDL_MOUSEBUTTONDOWN) {
+  if (tr_event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
     message += "(M) key down: ";
     switch (tr_event.button.button) {
     case SDL_BUTTON_LEFT:
@@ -129,7 +129,7 @@ void Camera::handle_inputs_mouse(const SDL_Event &tr_event, SDL_Window *tp_windo
       message += "RMB";
       break;
     }
-  } else if (tr_event.type == SDL_MOUSEBUTTONUP) {
+  } else if (tr_event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
     message += "(M) key up: ";
     switch (tr_event.button.button) {
     case SDL_BUTTON_LEFT:
@@ -161,15 +161,15 @@ void Camera::mouse_rotate(SDL_Window *tp_window)
   int window_height{ 0 };
 
   SDL_GetWindowSize(tp_window, &window_width, &window_height);
-  SDL_ShowCursor(SDL_DISABLE);
+  SDL_HideCursor();
 
   if (first_click) {
     SDL_WarpMouseInWindow(tp_window, (width / 2), (height / 2));
     first_click = false;
   }
 
-  int mouse_x{ 0 };
-  int mouse_y{ 0 };
+  float mouse_x{ 0 };
+  float mouse_y{ 0 };
 
   SDL_GetMouseState(&mouse_x, &mouse_y);
 
@@ -190,6 +190,6 @@ void Camera::mouse_rotate(SDL_Window *tp_window)
 
 void Camera::mouse_reset()
 {
-  SDL_ShowCursor(SDL_ENABLE);
+  SDL_ShowCursor();
   first_click = true;
 }
