@@ -23,8 +23,7 @@ std::string file_contents_to_string(const std::filesystem::path &tr_file);
 
 bool file_exists(const char *tp_file);
 bool file_exists(const std::string &tr_file);
-bool file_exists(const std::filesystem::path &tr_file,
-  std::filesystem::file_status t_s = std::filesystem::file_status{});
+bool file_exists(const std::filesystem::path &tr_file, std::filesystem::file_status t_status);
 
 template<typename T> std::vector<T> convert_bytes(const std::vector<uint8_t> &tr_data)
 {
