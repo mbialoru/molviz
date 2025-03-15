@@ -12,7 +12,7 @@ class ElementBuffer
 {
 public:
   ElementBuffer(std::vector<GLuint> &tr_indices);
-  ~ElementBuffer();
+  ~ElementBuffer() = default;
 
   void bind();
   void unbind();

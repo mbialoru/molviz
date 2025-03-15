@@ -9,13 +9,14 @@ target_link_system_libraries(
   PRIVATE
   CLI11::CLI11
   fmt::fmt
-  spdlog::spdlog
-  SDL2
-  imgui
-  OpenGL::OpenGL
   GLEW::GLEW
-  glm::glm)
+  glm::glm
+  imgui
+  nlohmann_json::nlohmann_json
+  OpenGL::OpenGL
+  SDL2
+  spdlog::spdlog)
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE "${CMAKE_BINARY_DIR}/config/include")
 
-add_dependencies(${CMAKE_PROJECT_NAME} ${CMAKE_PROJECT_NAME}_shaders)
+add_dependencies(${CMAKE_PROJECT_NAME} ${CMAKE_PROJECT_NAME}_resources)

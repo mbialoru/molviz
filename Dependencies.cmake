@@ -55,4 +55,8 @@ function(project_setup_dependencies)
     cpmaddpackage("gh:g-truc/glm#0.9.9.8")
   endif()
 
+  if(NOT TARGET nlohmann_json::nlohmann_json)
+    cpmaddpackage("gh:nlohmann/json#v3.11.2")
+  endif()
+
 endfunction()

@@ -15,7 +15,7 @@ std::string Molviz::gfx::shader_type_to_string(const ShaderType t_type)
     return { "VERTEX" };
     break;
   default:
-    spdlog::error("invalid shader type {} given", t_type);
+    spdlog::error("invalid shader type {} given", static_cast<int>(t_type));
     throw std::invalid_argument("invalid shader type");
     break;
   }
@@ -43,25 +43,25 @@ Shader::Shader(const std::filesystem::path &tr_vertex_shader, const std::filesys
   glShaderSource(vertex_shader, 1, &p_vertex_source, nullptr);
   glCompileShader(vertex_shader);
   compile_errors(vertex_shader, ShaderType::VERTEX);
+  spdlog::debug("compiled vertex shader file {}", tr_vertex_shader.filename().string());
 
   // process fragent shader
   const GLuint fragment_shader{ glCreateShader(GL_FRAGMENT_SHADER) };
   glShaderSource(fragment_shader, 1, &p_fragment_source, nullptr);
   glCompileShader(fragment_shader);
   compile_errors(fragment_shader, ShaderType::FRAGMENT);
+  spdlog::debug("compiled fragment shader file {}", tr_fragment_shader.filename().string());
 
   // process shader program
   glAttachShader(id, vertex_shader);
   glAttachShader(id, fragment_shader);
   glLinkProgram(id);
   compile_errors(id, ShaderType::PROGRAM);
+  spdlog::debug("linked shader program");
 
   // cleanup
   glDeleteShader(vertex_shader);
   glDeleteShader(fragment_shader);
-
-  spdlog::info(
-    "initialized shader program {} {}", tr_vertex_shader.filename().string(), tr_fragment_shader.filename().string());
 }
 
 Shader::~Shader() { cleanup(); }

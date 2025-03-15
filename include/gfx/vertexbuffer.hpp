@@ -20,7 +20,7 @@ class VertexBuffer
 {
 public:
   VertexBuffer(std::vector<Vertex> &tr_vertices);
-  ~VertexBuffer();
+  ~VertexBuffer() = default;
 
   void bind();
   void unbind();
