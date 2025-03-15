@@ -1,6 +1,8 @@
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 
+#define GLM_ENABLE_EXPERIMENTAL
+
 #pragma once
 
 #include <GL/glew.h>

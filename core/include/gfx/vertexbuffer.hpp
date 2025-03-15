@@ -1,6 +1,8 @@
 #ifndef VERTEXBUFFER_HPP
 #define VERTEXBUFFER_HPP
 
+#define GLM_ENABLE_EXPERIMENTAL
+
 #pragma once
 
 #include <GL/glew.h>
