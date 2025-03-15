@@ -1,43 +1,146 @@
+#include <GL/glew.h>
+#include <SDL.h>
 #include <catch2/catch_test_macros.hpp>
+#include <spdlog/spdlog.h>
+#include <utility>
 
-#include <iostream>
+#include "libmolviz/gfx/elementbuffer.hpp"
+#include "libmolviz/gfx/mesh.hpp"
+#include "libmolviz/gfx/shader.hpp"
+#include "libmolviz/gfx/vertexarray.hpp"
+#include "libmolviz/gfx/vertexbuffer.hpp"
 
-#include "libmorse/fft.hpp"
-#include "libmorse/morse.hpp"
+// utilities
 
-TEST_CASE("int_log2 works", "[int_log2]")
+std::pair<SDL_Window *, SDL_GLContext> create_dummy_opengl_context()
 {
-  REQUIRE(int_log2(8) == 3);
-  REQUIRE(int_log2(64) == 6);
-  REQUIRE(int_log2(1024) == 10);
-  REQUIRE(int_log2(1048576) == 20);
+  // init SDL
+  if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+    spdlog::error("SDL initialization error: {}", SDL_GetError());
+    FAIL();
+  }
+
+  // create dummy hidden SDL window for a dummy OpenGL context
+  SDL_WindowFlags window_flags{ static_cast<SDL_WindowFlags>(SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN) };
+  SDL_Window *p_window{ SDL_CreateWindow(nullptr, 0, 0, 0, 0, window_flags) };
+  SDL_GLContext context{ SDL_GL_CreateContext(p_window) };
+
+  // init GLEW after OpenGL context - Missing GL version error otherwise
+  GLenum status{ glewInit() };
+  if (status != GLEW_OK) {
+    std::string error_message{ reinterpret_cast<const char *>(glewGetErrorString(status)) };
+    spdlog::error("GLEW init failed! error: {}", error_message);
+    FAIL();
+  }
+
+  return { p_window, context };
 }
 
-TEST_CASE("reverse_number works", "[reverse_number]")
+void cleanup_dummy_opengl_context(SDL_Window *tp_window, SDL_GLContext t_context)
 {
-  REQUIRE(reverse_number(1, 1) == 0);
-  REQUIRE(reverse_number(5, 5) == 2);
-  REQUIRE(reverse_number(30, 30) == 7);
-  REQUIRE(reverse_number(32, 32) == 0);
-  REQUIRE(reverse_number(255, 65535) == 127);
+  SDL_GL_DeleteContext(t_context);
+  SDL_DestroyWindow(tp_window);
+  SDL_Quit();
 }
 
-TEST_CASE("reverse_order works", "[reverse_order]")
+// unit tests
+
+TEST_CASE("ElementBuffer valid creation and cleanup", "[ElementBuffer, EBO]")
 {
-  auto array_values{ std::array<double, 10>{ 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0 } };
-  auto p_array{ std::make_shared<double[]>(10) };
-  for (std::size_t i{ 0 }; i < 10; ++i) { p_array[i] = array_values[i]; }
+  using namespace Molviz::gfx;
 
-  reverse_order(p_array, 4);
+  auto [p_window, context]{ create_dummy_opengl_context() };
 
-  REQUIRE(p_array[0] == 0.0);
-  REQUIRE(p_array[1] == 1.0);
-  REQUIRE(p_array[2] == 4.0);
-  REQUIRE(p_array[3] == 5.0);
-  REQUIRE(p_array[4] == 2.0);
-  REQUIRE(p_array[5] == 3.0);
-  REQUIRE(p_array[6] == 6.0);
-  REQUIRE(p_array[7] == 7.0);
-  REQUIRE(p_array[8] == 8.0);
-  REQUIRE(p_array[9] == 9.0);
+  std::vector<GLuint> indices;
+  ElementBuffer element_buffer{ indices };
+  element_buffer.bind();
+
+  REQUIRE(glIsBuffer(element_buffer.id));
+
+  element_buffer.unbind();
+  element_buffer.cleanup();
+
+  REQUIRE_FALSE(glIsBuffer(element_buffer.id));
+
+  cleanup_dummy_opengl_context(p_window, context);
+}
+
+TEST_CASE("VertexBuffer valud creation and cleanup", "[VertexBuffer, VBO]")
+{
+  using namespace Molviz::gfx;
+
+  auto [p_window, context]{ create_dummy_opengl_context() };
+
+  std::vector<Vertex> vertices;
+  VertexBuffer vertex_buffer{ vertices };
+
+  REQUIRE(glIsBuffer(vertex_buffer.id));
+
+  vertex_buffer.unbind();
+  vertex_buffer.cleanup();
+
+  REQUIRE_FALSE(glIsBuffer(vertex_buffer.id));
+
+  cleanup_dummy_opengl_context(p_window, context);
+}
+
+TEST_CASE("VertexArray valid creation and cleanup", "[VertexArray, VAO]")
+{
+  using namespace Molviz::gfx;
+
+  auto [p_window, context]{ create_dummy_opengl_context() };
+
+  VertexArray vertex_array;
+  vertex_array.bind();
+
+  REQUIRE(glIsVertexArray(vertex_array.id));
+
+  vertex_array.unbind();
+  vertex_array.cleanup();
+
+  REQUIRE_FALSE(glIsVertexArray(vertex_array.id));
+
+  cleanup_dummy_opengl_context(p_window, context);
+}
+
+TEST_CASE("Shader valid creation and cleanup", "[Shader]")
+{
+  using namespace Molviz::gfx;
+
+  std::filesystem::path vertex_shader{ "/workspaces/molviz/test/resources/default.frag" };
+  std::filesystem::path fragment_shader{ "/workspaces/molviz/test/resources/default.frag" };
+
+  auto [p_window, context]{ create_dummy_opengl_context() };
+
+  Shader shader{ vertex_shader, fragment_shader };
+
+  REQUIRE(glIsProgram(shader.id));
+
+  shader.cleanup();
+
+  REQUIRE_FALSE(glIsProgram(shader.id));
+
+  cleanup_dummy_opengl_context(p_window, context);
+}
+
+TEST_CASE("Mesh valid creation and cleanup", "[Mesh]")
+{
+  using namespace Molviz::gfx;
+
+  std::vector<Vertex> vertices{ Vertex{ glm::vec3(-0.1f, -0.1f, 0.1f) },
+    Vertex{ glm::vec3(-0.1f, -0.1f, -0.1f) },
+    Vertex{ glm::vec3(0.1f, -0.1f, -0.1f) },
+    Vertex{ glm::vec3(0.1f, -0.1f, 0.1f) },
+    Vertex{ glm::vec3(-0.1f, 0.1f, 0.1f) },
+    Vertex{ glm::vec3(-0.1f, 0.1f, -0.1f) },
+    Vertex{ glm::vec3(0.1f, 0.1f, -0.1f) },
+    Vertex{ glm::vec3(0.1f, 0.1f, 0.1f) } };
+
+  std::vector<GLuint> indices{
+    0, 1, 2, 0, 2, 3, 0, 4, 7, 0, 7, 3, 3, 7, 6, 3, 6, 2, 2, 6, 5, 2, 5, 1, 1, 5, 4, 1, 4, 0, 4, 5, 6, 4, 6, 7
+  };
+
+  auto [p_window, context]{ create_dummy_opengl_context() };
+
+  Mesh mesh{ vertices, indices };
 }
