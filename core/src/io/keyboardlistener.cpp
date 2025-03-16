@@ -27,7 +27,9 @@ void KeyboardListener::on_event(const Event &tr_event)
     sstream << "Key Double ";
     break;
   default:
-    throw InvalidEvent();
+    std::stringstream msg;
+    msg << static_cast<int>(key_event.get_type());
+    throw InvalidInputEvent(msg.str());
     break;
   }
 

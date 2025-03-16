@@ -27,15 +27,15 @@ private:
   std::string m_error_message;
 };
 
-class InvalidEvent : public std::exception
+class InvalidInputEvent : public std::exception
 {
 public:
-  InvalidEvent() : m_error_message("invalid input event type") {}
-  explicit InvalidEvent(std::string t_event_type) : InvalidEvent()
+  InvalidInputEvent() : m_error_message("invalid input event type") {}
+  explicit InvalidInputEvent(std::string t_event_type) : InvalidInputEvent()
   {
     spdlog::error("{} {}", m_error_message, t_event_type);
   }
-  explicit InvalidEvent(const char *tp_event_type) : InvalidEvent(std::string(tp_event_type)) {}
+  explicit InvalidInputEvent(const char *tp_event_type) : InvalidInputEvent(std::string(tp_event_type)) {}
 
   [[nodiscard]] const char *what() const noexcept override { return m_error_message.c_str(); }
 

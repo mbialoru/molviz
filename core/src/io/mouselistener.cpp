@@ -21,7 +21,7 @@ void MouseListener::on_event(const Event &tr_event)
     spdlog::debug("not a mouse key event");
   }
 
-  throw InvalidEvent();
+  throw InvalidInputEvent("could not cast to mouse event types");
 }
 
 void MouseListener::on_event(const MouseEvent &tr_event)
@@ -33,7 +33,9 @@ void MouseListener::on_event(const MouseEvent &tr_event)
     sstream << "Mouse Moved ";
     break;
   default:
-    throw InvalidEvent();
+    std::stringstream msg;
+    msg << static_cast<int>(tr_event.get_type());
+    throw InvalidInputEvent(msg.str());
     break;
   }
 
@@ -60,7 +62,9 @@ void MouseListener::on_event(const MouseKeyEvent &tr_event)
     sstream << "Key Double ";
     break;
   default:
-    throw InvalidEvent();
+    std::stringstream msg;
+    msg << static_cast<int>(tr_event.get_type());
+    throw InvalidInputEvent(msg.str());
     break;
   }
 
